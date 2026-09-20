@@ -29,7 +29,16 @@ def comment(anchor: str) -> ReviewComment:
 
 
 class FakeReviewer:
-    def review(self, latex, score, role, *, max_comments, grammarly_observations=()):
+    def review(
+        self,
+        latex,
+        score,
+        role,
+        *,
+        max_comments,
+        grammarly_observations=(),
+        venue_profile=None,
+    ):
         valid = comment("The method is robust in every setting.")
         valid = ReviewComment(
             **{

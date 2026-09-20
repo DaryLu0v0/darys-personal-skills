@@ -40,6 +40,16 @@ class GrammarlyObservation:
 
 
 @dataclass(frozen=True)
+class VenueProfile:
+    name: str = "general"
+    guidance: str = ""
+    source_name: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class EditNote:
     original: str
     replacement: str

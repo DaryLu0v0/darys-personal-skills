@@ -1,6 +1,6 @@
 import json
 
-from tex_reviewer.cli import _read_grammarly_observations
+from tex_reviewer.cli import _read_grammarly_observations, _read_venue_profile
 
 
 def test_reads_uniquely_anchored_grammarly_observations(tmp_path) -> None:
@@ -54,3 +54,27 @@ def test_rejects_ambiguous_grammarly_observation_anchor(tmp_path) -> None:
         assert "exactly once" in str(exc)
     else:
         raise AssertionError("ambiguous Grammarly anchor was accepted")
+
+
+def test_general_venue_profile_needs_no_guidance() -> None:
+    profile = _read_venue_profile("general", None)
+    assert profile.name == "general"
+    assert profile.guidance == ""
+
+
+def test_specific_venue_profile_requires_current_guidance() -> None:
+    try:
+        _read_venue_profile("Example Conference 2030", None)
+    except ValueError as exc:
+        assert "requires --venue-guidance" in str(exc)
+    else:
+        raise AssertionError("venue-specific review was accepted without guidance")
+
+
+def test_reads_specific_venue_profile(tmp_path) -> None:
+    guidance = tmp_path / "review-guide.txt"
+    guidance.write_text("Assess evidence, novelty, and reproducibility.", encoding="utf-8")
+    profile = _read_venue_profile("Example Conference 2030", guidance)
+    assert profile.name == "Example Conference 2030"
+    assert profile.source_name == "review-guide.txt"
+    assert "reproducibility" in profile.guidance

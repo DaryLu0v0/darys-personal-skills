@@ -7,7 +7,8 @@
 - the `scientific-tex-reviewer` Codex skill;
 - a conservative Python reviewer for a single UTF-8 `.tex` source file;
 - Grammarly aggregate scoring and supervised UI-observation guidance;
-- independent AI-pattern, grammar, scientific-concept, and ICLR-overview reviewers;
+- independent humanization, grammar, scientific-concept, citation/evidence, and venue-agnostic overview reviewers;
+- optional venue profiles sourced from current official conference or journal guidance;
 - comment-only LaTeX suggestions and validated native Overleaf-comment manifests;
 - tests for source preservation, anchoring, reviewer roles, score acceptance, and manifest drift.
 

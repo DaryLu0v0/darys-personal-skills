@@ -7,9 +7,10 @@
 | `humanize` | Natural scientific voice, specificity, flow, and formulaic phrasing informed by Grammarly measurements and validated UI observations | Comment only; never treat an AI estimate as proof or optimize for detector evasion |
 | `grammar` | Grammar, punctuation, terminology consistency, antecedents, and local scientific clarity | Prefer minimal edits; retain appropriate passive voice and technical meaning |
 | `concept` | Definitions, assumptions, units, claim/evidence alignment, controls, uncertainty, methods, and reproducibility | Use manuscript evidence only; phrase uncertain points as author questions |
-| `iclr-overview` | Problem, motivation, literature placement, claim support, technical rigor, significance, clarity, and reproducibility | Treat as an AI-assisted author pre-review, not an official review or authoritative accept/reject decision |
+| `citation` | Claim-to-citation coverage, citation placement, bibliographic integrity, and source support | Never invent sources; specific additions require independent verification |
+| `overview` | Venue-agnostic assessment of motivation, novelty, evidence, rigor, significance, limitations, clarity, and reproducibility | Apply venue criteria only from a supplied current profile; never issue an authoritative accept/reject decision |
 
-The ICLR overview follows the current ICLR 2027 reviewer-guide themes: identify the problem, assess motivation and literature placement, determine whether rigorous evidence supports the claims, and assess significance/new knowledge. Lack of state-of-the-art performance alone is not a rejection basis.
+The default overview is deliberately venue-agnostic. ICLR, NeurIPS, AAAI, IEEE, ACM, Nature Portfolio, Elsevier journals, and other venues are optional profiles, not separate core reviewers.
 
 ## Commands
 
@@ -23,8 +24,16 @@ Selected roles and bounded volume:
 
 ```powershell
 tex-review panel .\paper.tex `
-  --reviewers humanize grammar concept iclr-overview `
+  --reviewers humanize grammar concept citation overview `
   --max-comments-per-reviewer 8
+```
+
+Apply a venue-specific rubric only from current official guidance:
+
+```powershell
+tex-review panel .\paper.tex `
+  --venue "Target Venue and Year" `
+  --venue-guidance .\official-review-guide.txt
 ```
 
 When a supervised Grammarly UI pass produced passage-level observations, provide them to the humanization reviewer:
@@ -56,6 +65,6 @@ The manifest is bound to the complete UTF-8 source SHA-256. Reject missing and n
 
 ## Interpretation
 
-Reviewers are deliberately independent and can comment on the same passage for different reasons. The humanization reviewer reads Grammarly evidence but does not attempt to lower its AI estimate. Do not collapse concept and grammar comments merely because their anchors overlap. Deduplicate only identical findings from the same role.
+Reviewers are deliberately independent and can comment on the same passage for different reasons. The humanization reviewer reads Grammarly evidence but does not attempt to lower its AI estimate. The citation reviewer may flag missing support without naming a paper; specific sources require the separate verified citation workflow. Do not collapse comments from different roles merely because their anchors overlap. Deduplicate only identical findings from the same role.
 
 The panel is advisory. Summarize accepted/rejected anchor counts and validation warnings. Never convert its output into a claim of scientific correctness or publication eligibility.

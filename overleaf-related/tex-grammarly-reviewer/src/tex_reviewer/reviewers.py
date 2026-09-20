@@ -49,24 +49,35 @@ REVIEWER_ROLES: dict[str, ReviewerRole] = {
             "uncertain findings as questions for the author and mark them as requiring author checking."
         ),
     ),
-    "iclr-overview": ReviewerRole(
-        reviewer_id="iclr-overview",
-        label="ICLR overview reviewer",
-        short_label="ICLR",
+    "citation": ReviewerRole(
+        reviewer_id="citation",
+        label="Citation and evidence reviewer",
+        short_label="Citation",
         instructions=(
-            "Provide a constructive ICLR-style pre-review aligned with the ICLR 2027 reviewer guide. "
-            "Assess the specific problem, motivation and placement in the literature, whether claims are "
-            "supported with scientifically rigorous evidence, significance and new knowledge, clarity, "
-            "technical correctness, experimental rigor, and reproducibility. Distinguish decision-critical "
-            "weaknesses from optional improvements. Do not treat lack of state-of-the-art performance alone "
-            "as grounds for rejection. This is an AI-assisted author pre-review, not an official review or "
-            "submission-ready recommendation."
+            "Focus on claim-to-citation coverage, citation placement, unsupported literature claims, and "
+            "whether the visible citation context appears relevant to the claim. Never invent a paper, "
+            "author, title, venue, year, DOI, URL, or BibTeX entry. Without independently verified source "
+            "evidence, request a citation or propose a search direction rather than naming a specific work. "
+            "Treat source existence, bibliographic metadata, and claim support as separate checks. Keep all "
+            "citation additions comment-only and require author approval."
+        ),
+    ),
+    "overview": ReviewerRole(
+        reviewer_id="overview",
+        label="Scientific overview reviewer",
+        short_label="Overview",
+        instructions=(
+            "Provide a constructive, venue-agnostic scientific pre-review. Assess the problem and motivation, "
+            "literature placement, novelty, claim support, technical rigor, experimental design, significance, "
+            "limitations, clarity, and reproducibility. Distinguish decision-critical weaknesses from optional "
+            "improvements. Apply venue-specific criteria only when a current venue profile is supplied. This is "
+            "an AI-assisted author pre-review, not an official review or authoritative accept/reject decision."
         ),
     ),
 }
 
 
-DEFAULT_REVIEWERS = tuple(REVIEWER_ROLES)
+DEFAULT_REVIEWERS = ("humanize", "grammar", "concept", "citation", "overview")
 
 
 def get_reviewer_roles(ids: tuple[str, ...]) -> tuple[ReviewerRole, ...]:

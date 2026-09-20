@@ -7,7 +7,13 @@ import json
 from pathlib import Path
 from typing import Protocol
 
-from .models import GrammarlyObservation, ReviewComment, ReviewScore, RoleReview
+from .models import (
+    GrammarlyObservation,
+    ReviewComment,
+    ReviewScore,
+    RoleReview,
+    VenueProfile,
+)
 from .reviewers import ReviewerRole
 
 
@@ -20,6 +26,7 @@ class PanelReviewer(Protocol):
         *,
         max_comments: int,
         grammarly_observations: tuple[GrammarlyObservation, ...] = (),
+        venue_profile: VenueProfile = VenueProfile(),
     ) -> RoleReview: ...
 
 
@@ -126,6 +133,7 @@ def generate_panel(
     output_dir: Path,
     max_comments_per_reviewer: int = 12,
     grammarly_observations: tuple[GrammarlyObservation, ...] = (),
+    venue_profile: VenueProfile = VenueProfile(),
 ) -> PanelResult:
     for index, observation in enumerate(grammarly_observations, start=1):
         occurrences = source.count(observation.anchor_text)
@@ -148,6 +156,7 @@ def generate_panel(
             role,
             max_comments=max_comments_per_reviewer,
             grammarly_observations=grammarly_observations,
+            venue_profile=venue_profile,
         )
         comments: list[dict[str, object]] = []
         for raw_comment in role_review.comments[:max_comments_per_reviewer]:
@@ -194,6 +203,7 @@ def generate_panel(
         "grammarly_observations": [
             observation.to_dict() for observation in grammarly_observations
         ],
+        "venue_profile": venue_profile.to_dict(),
         "publication": {
             "target": "overleaf-native-comments",
             "status": "not-published",

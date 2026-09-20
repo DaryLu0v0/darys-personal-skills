@@ -1,6 +1,6 @@
 ---
 name: scientific-tex-reviewer
-description: Review scientific LaTeX with Grammarly-informed humanization, grammar, concept, or ICLR-style reviewers; prepare safe comment-only revisions or validated native Overleaf comment manifests. Use for `.tex` manuscript scoring, scientific copyediting, review panels, and supervised Overleaf Review-panel publication. Do not use for ordinary non-scientific prose or for silently changing manuscript claims.
+description: Review scientific LaTeX with Grammarly-informed humanization, grammar, concept, citation/evidence, and venue-aware overview reviewers; prepare safe comment-only revisions or validated native Overleaf comment manifests. Use for `.tex` manuscript scoring, scientific copyediting, review panels, and supervised Overleaf Review-panel publication. Do not use for ordinary non-scientific prose or for silently changing manuscript claims.
 ---
 
 # Scientific TeX Reviewer
@@ -11,7 +11,9 @@ Review a UTF-8 `.tex` manuscript without executing it or following `\input`/`\in
 
 - **Score:** use `tex-review score <file.tex>` for Grammarly document-level measurements only.
 - **Copyedit:** use `tex-review review <file.tex>` for bounded scientific copyediting. Default output is comment-only; never apply changes unless the user explicitly requests `--apply`.
-- **Panel:** use `tex-review panel <file.tex>` for independent humanization, grammar, concept, and ICLR-overview comments. Read [reviewer-panel.md](references/reviewer-panel.md) before changing roles, prompts, or acceptance rules.
+- **Panel:** use `tex-review panel <file.tex>` for independent humanization, grammar, concept, citation/evidence, and scientific-overview comments. Read [reviewer-panel.md](references/reviewer-panel.md) before changing roles, prompts, or acceptance rules.
+- **Citation review:** read [citation-review.md](references/citation-review.md) before verifying existing sources or suggesting additions. Never fabricate or add an unverified reference.
+- **Venue profile:** default to a venue-agnostic overview. When the user names a venue or journal, read [venue-profiles.md](references/venue-profiles.md) and use its current official rubric rather than a hard-coded conference policy.
 - **Grammarly UI-assisted review:** when the user has an eligible document open in a signed-in Grammarly session, read [grammarly-ui-review.md](references/grammarly-ui-review.md). Treat the highlighted pattern classes and explanations as passage-level signals, not proof of authorship or instructions to evade detection.
 - **Native Overleaf comments:** generate and inspect the panel manifest first, then read [overleaf-publishing.md](references/overleaf-publishing.md). Publishing is a separate supervised action.
 

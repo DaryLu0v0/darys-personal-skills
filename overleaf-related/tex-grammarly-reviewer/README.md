@@ -5,7 +5,7 @@ A conservative, comment-first reviewer for English prose inside a single `.tex` 
 1. extracts reviewable prose without executing LaTeX or following `\input` files;
 2. obtains Grammarly's official writing-quality scores and contextual AI estimate;
 3. lets a humanization reviewer interpret Grammarly measurements and validated UI observations;
-4. generates anchored humanization, grammar, concept, and ICLR-style comments without editing the source;
+4. generates anchored humanization, grammar, concept, citation/evidence, and scientific-overview comments without editing the source;
 5. validates every proposed Overleaf comment against the exact source and its SHA-256.
 
 An optional bounded copyedit mode can propose replacements, but the default outputs remain comments. Grammarly's AI estimate is reported rather than optimized.
@@ -77,7 +77,8 @@ The default panel contains:
 - `humanize`: natural scientific voice, specificity, and flow informed by Grammarly measurements and validated observations;
 - `grammar`: minimal grammar and scientific-clarity corrections;
 - `concept`: assumptions, units, claim/evidence alignment, methods, controls, and reproducibility;
-- `iclr-overview`: an ICLR 2027-style author pre-review covering motivation, literature placement, rigor, significance, clarity, and reproducibility.
+- `citation`: citation coverage, placement, integrity, and source support without invented references;
+- `overview`: a venue-agnostic author pre-review covering motivation, novelty, evidence, rigor, significance, limitations, clarity, and reproducibility.
 
 The command creates `overleaf-comments.json` and `review-panel.md` inside a timestamped audit directory. Each proposed thread is bound to an exact unique source substring and the complete source SHA-256. It is marked `not-published` until a supervised Overleaf publisher verifies and posts it.
 
@@ -85,9 +86,19 @@ Select roles or cap comment volume:
 
 ```powershell
 tex-review panel .\paper.tex `
-  --reviewers humanize grammar concept iclr-overview `
+  --reviewers humanize grammar concept citation overview `
   --max-comments-per-reviewer 8
 ```
+
+The overview remains general unless current official venue criteria are supplied:
+
+```powershell
+tex-review panel .\paper.tex `
+  --venue "Target Venue and Year" `
+  --venue-guidance .\official-review-guide.txt
+```
+
+This keeps ICLR, NeurIPS, AAAI, IEEE, ACM, and journal requirements as optional profiles rather than hard-coded defaults.
 
 Use passage-level feedback copied during a supervised Grammarly UI pass:
 

@@ -9,7 +9,7 @@ import sys
 
 from .clients import GrammarlyClient, OpenAIEditor, OpenAIPanelReviewer, ServiceError
 from .latex import latex_to_plain_text
-from .models import GrammarlyObservation
+from .models import GrammarlyObservation, VenueProfile
 from .panel import generate_panel
 from .reviewers import DEFAULT_REVIEWERS, REVIEWER_ROLES, get_reviewer_roles
 from .workflow import ReviewConfig, review_document
@@ -50,6 +50,16 @@ def _parser() -> argparse.ArgumentParser:
         "--grammarly-observations",
         type=Path,
         help="validated JSON observations copied from a supervised Grammarly UI pass",
+    )
+    panel.add_argument(
+        "--venue",
+        default="general",
+        help="target venue/profile name; defaults to venue-agnostic review",
+    )
+    panel.add_argument(
+        "--venue-guidance",
+        type=Path,
+        help="current official venue or track criteria as a UTF-8 text file",
     )
 
     review = subparsers.add_parser("review", help="Iteratively revise and rescore a .tex file")
@@ -150,6 +160,26 @@ def _read_grammarly_observations(
     return tuple(observations)
 
 
+def _read_venue_profile(name: str, guidance_path: Path | None) -> VenueProfile:
+    normalized = name.strip()
+    if not normalized:
+        raise ValueError("--venue must not be empty")
+    if normalized.casefold() != "general" and guidance_path is None:
+        raise ValueError(
+            "a venue-specific review requires --venue-guidance with current official criteria"
+        )
+    guidance = ""
+    source_name = ""
+    if guidance_path is not None:
+        guidance = guidance_path.read_text(encoding="utf-8").strip()
+        if not guidance:
+            raise ValueError("--venue-guidance must not be empty")
+        if len(guidance) > 50_000:
+            raise ValueError("--venue-guidance must not exceed 50,000 characters")
+        source_name = guidance_path.name
+    return VenueProfile(name=normalized, guidance=guidance, source_name=source_name)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
@@ -168,6 +198,7 @@ def main(argv: list[str] | None = None) -> int:
             observations = _read_grammarly_observations(
                 args.grammarly_observations, source
             )
+            venue_profile = _read_venue_profile(args.venue, args.venue_guidance)
             output_dir = (
                 args.output_dir.resolve()
                 if args.output_dir
@@ -182,6 +213,7 @@ def main(argv: list[str] | None = None) -> int:
                 output_dir=output_dir,
                 max_comments_per_reviewer=args.max_comments_per_reviewer,
                 grammarly_observations=observations,
+                venue_profile=venue_profile,
             )
             print(
                 json.dumps(
@@ -191,6 +223,7 @@ def main(argv: list[str] | None = None) -> int:
                         "accepted_comments": result.accepted_comments,
                         "rejected_comments": result.rejected_comments,
                         "grammarly_observations": len(observations),
+                        "venue_profile": venue_profile.name,
                         "publication_status": "not-published",
                     },
                     indent=2,

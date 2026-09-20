@@ -32,7 +32,7 @@ Reobserve after every UI mutation. Never reuse stale coordinates or element inde
 
 ## Identity and mutations
 
-Overleaf attributes every thread to the signed-in account. Role prefixes distinguish `[Humanization reviewer]`, `[Grammar and clarity reviewer]`, `[Scientific concept reviewer]`, and `[ICLR overview reviewer]`; they are not separate human identities.
+Overleaf attributes every thread to the signed-in account. Role prefixes distinguish `[Humanization reviewer]`, `[Grammar and clarity reviewer]`, `[Scientific concept reviewer]`, `[Citation and evidence reviewer]`, and `[Scientific overview reviewer]`; they are not separate human identities.
 
 Do not resolve, delete, reply to, or edit existing comments unless the user explicitly requests that separate action. Do not switch collaborators or sharing permissions. Never attempt multiple-account impersonation.
 
