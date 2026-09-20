@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.pytest-tmp*/
+.venv/
+dist/
+build/
+*.egg-info/
+.env
+.tex-reviewer/
+*.reviewed.tex
+*.review-comments.tex
+overleaf-publication-receipt.json

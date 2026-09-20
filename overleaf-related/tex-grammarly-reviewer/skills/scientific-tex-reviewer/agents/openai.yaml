@@ -1,0 +1,4 @@
+interface:
+  display_name: "Scientific TeX Reviewer"
+  short_description: "Review LaTeX and publish Overleaf feedback"
+  default_prompt: "Use $scientific-tex-reviewer to review my LaTeX manuscript with the scientific panel and prepare native Overleaf comments."

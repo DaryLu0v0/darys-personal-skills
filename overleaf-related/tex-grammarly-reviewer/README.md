@@ -1,0 +1,144 @@
+# TeX Grammarly Reviewer
+
+A conservative command-line reviewer for English prose inside a single `.tex` file. It:
+
+1. extracts reviewable prose without executing LaTeX or following `\input` files;
+2. obtains Grammarly's official AI-detection and writing-quality scores;
+3. asks an editing model, using a scientific-writing preference by default, for a prose-only revision and rationale;
+4. rejects LaTeX-unsafe edits and score regressions;
+5. repeats until both targets are reached or a bounded stop condition fires.
+
+It also provides a four-role scientific review panel that produces validated anchors for native Overleaf comments.
+
+The default output is a `.review-comments.tex` file. It contains the original LaTeX unchanged plus `% TEX-REVIEW ...` comments with proposed replacements and explanations. Applying edits requires the explicit `--apply` option. Every candidate, accepted revision, score, and stop reason is saved under `.tex-reviewer/` beside the input file.
+
+## What “Grammarly issues” means
+
+Grammarly's official Writing Score API returns category scores, not the individual suggestion cards shown in Grammarly's editor. This tool defines:
+
+```text
+issue_level = 1 - correctness_score
+```
+
+Thus, lowering `issue_level` means raising Grammarly's correctness score. The tool reports the other writing scores as well. Grammarly's API supplies aggregate measurements, not passage-level explanations. Explanations in the comment report are explicitly labeled as scientific-editor rationale. When an already signed-in Grammarly document is available, the companion Codex skill can supervise a read-only pass over Grammarly's UI-only strong/moderate/weak pattern highlights and explanations. Those observations remain distinct from editor inference. The tool never claims that an AI-detection percentage proves authorship; Grammarly itself describes that number as an estimate.
+
+## Scientific-writing preference
+
+`scientific` is the default editor preference. It favors:
+
+- precise, falsifiable statements and calibrated uncertainty;
+- concise logical transitions and consistent technical terminology;
+- appropriate passive voice when the actor is unimportant;
+- preservation of qualified claims and the author's scientific interpretation;
+- avoidance of promotional language, unnecessary intensifiers, and stock academic phrases.
+
+Use `--preference general` for ordinary formal prose, or add an author-controlled requirement with `--style-note`, for example `--style-note "Use IEEE terminology and retain first-person plural."`
+
+## Requirements
+
+- Python 3.11 or newer.
+- Grammarly Enterprise or Grammarly for Education organization-admin OAuth credentials with Writing Score and AI Detection access.
+- An OpenAI API key for automatic editing. The model is configurable; the default is `gpt-6-astra`.
+
+Documents are transmitted to Grammarly for scoring and to OpenAI for revision. Do not use this tool with confidential material unless your organization's policies permit both services.
+
+## Install
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+python -m pip install -e ".[test]"
+```
+
+Set credentials in the current shell (do not put secrets in the repository):
+
+```powershell
+$env:GRAMMARLY_CLIENT_ID = "..."
+$env:GRAMMARLY_CLIENT_SECRET = "..."
+$env:OPENAI_API_KEY = "..."
+```
+
+## Use
+
+Score only:
+
+```powershell
+tex-review score .\paper.tex
+```
+
+Generate the multi-reviewer panel without changing the manuscript or publishing anything:
+
+```powershell
+tex-review panel .\paper.tex
+```
+
+The default panel contains:
+
+- `ai-rate`: AI-pattern, attribution, and disclosure review using Grammarly only as an aggregate signal;
+- `grammar`: minimal grammar and scientific-clarity corrections;
+- `concept`: assumptions, units, claim/evidence alignment, methods, controls, and reproducibility;
+- `iclr-overview`: an ICLR 2027-style author pre-review covering motivation, literature placement, rigor, significance, clarity, and reproducibility.
+
+The command creates `overleaf-comments.json` and `review-panel.md` inside a timestamped audit directory. Each proposed thread is bound to an exact unique source substring and the complete source SHA-256. It is marked `not-published` until a supervised Overleaf publisher verifies and posts it.
+
+Select roles or cap comment volume:
+
+```powershell
+tex-review panel .\paper.tex `
+  --reviewers grammar concept iclr-overview `
+  --max-comments-per-reviewer 8
+```
+
+Review with the conservative defaults (scientific preference, comment-only output, at most five candidates, and stop after two consecutive rejections):
+
+```powershell
+tex-review review .\paper.tex
+```
+
+This creates `paper.review-comments.tex`. Suggested replacement lines are comments, so compiling it still compiles the original prose.
+
+Set thresholds and output explicitly:
+
+```powershell
+tex-review review .\paper.tex `
+  --output .\paper.review-comments.tex `
+  --preference scientific `
+  --target-ai 0.20 `
+  --target-issue-level 0.05 `
+  --max-attempts 5 `
+  --patience 2
+```
+
+Apply the accepted candidate only when desired:
+
+```powershell
+tex-review review .\paper.tex --apply --output .\paper.reviewed.tex
+```
+
+Use `--apply --in-place` only when you intentionally want to overwrite the input. A pre-overwrite backup is saved in that run's audit directory. `--in-place` is rejected in comment mode.
+
+## Acceptance and stopping rules
+
+A candidate must preserve the preamble, braces, ordered environment inventory, citations, references, labels, URLs, includes, image paths, mathematical content, and numeric tokens. It is accepted only if:
+
+- AI percentage does not increase;
+- correctness deficit does not increase; and
+- at least one of those metrics improves.
+
+The run stops when the requested targets are met, the attempt limit is reached, or `--patience` consecutive candidates are rejected. `--tolerance` can accommodate small score variance, but the safest default is zero.
+
+## Current scope
+
+- Reviews one UTF-8 `.tex` file at a time.
+- Does not execute TeX, compile the document, or recursively read `\input`/`\include` files.
+- Protects structural tokens, but a final human review and normal LaTeX compilation remain required.
+- The CLI does not automate Grammarly's website or browser extension. The companion Codex skill can inspect an already open Grammarly editor under user supervision, without accepting rewrites or changing the document.
+- Cannot retrieve Grammarly's UI-only highlighted passages or AI Rewriter suggestions through the public score APIs.
+- Native Overleaf publishing is deliberately a supervised browser step because Overleaf does not expose a documented public bulk-comment API. See [the native review-panel design](docs/OVERLEAF_REVIEW_PANEL.md).
+- Native comments are authored by the signed-in Overleaf account. Reviewer roles are visible labels, not impersonated user identities.
+
+## Test
+
+```powershell
+python -m pytest -q
+```
