@@ -30,7 +30,6 @@ class Editor(Protocol):
 class ReviewConfig:
     max_attempts: int = 5
     patience: int = 2
-    target_ai: float = 0.20
     target_issue_level: float = 0.05
     tolerance: float = 0.0
     preference: str = "scientific"
@@ -77,8 +76,8 @@ def review_document(
     stop_reason = "maximum attempts reached"
     attempts_run = 0
 
-    if score.ai_generated <= config.target_ai and score.issue_level <= config.target_issue_level:
-        stop_reason = "targets satisfied by original"
+    if score.issue_level <= config.target_issue_level:
+        stop_reason = "correctness target satisfied by original"
     else:
         for attempt in range(1, config.max_attempts + 1):
             attempts_run = attempt
@@ -118,16 +117,16 @@ def review_document(
                 else:
                     failures += 1
                     feedback = (
-                        "Rejected because both Grammarly objectives did not Pareto-improve. "
-                        f"AI {score.ai_generated:.4f}->{candidate_score.ai_generated:.4f}; "
-                        f"issue level {score.issue_level:.4f}->{candidate_score.issue_level:.4f}."
+                        "Rejected because Grammarly correctness did not improve. "
+                        f"Issue level {score.issue_level:.4f}->{candidate_score.issue_level:.4f}. "
+                        "AI likelihood is reported for context only and is not an acceptance objective."
                     )
                     entry.update({"status": "rejected-score", "reason": feedback})
                 history.append(entry)
 
             _write_json(run_dir / "history.json", history)
-            if score.ai_generated <= config.target_ai and score.issue_level <= config.target_issue_level:
-                stop_reason = "targets satisfied"
+            if score.issue_level <= config.target_issue_level:
+                stop_reason = "correctness target satisfied"
                 break
             if failures >= config.patience:
                 stop_reason = "stopped after consecutive rejected revisions"

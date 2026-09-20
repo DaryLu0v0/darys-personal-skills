@@ -1,14 +1,14 @@
 # TeX Grammarly Reviewer
 
-A conservative command-line reviewer for English prose inside a single `.tex` file. It:
+A conservative, comment-first reviewer for English prose inside a single `.tex` file. It:
 
 1. extracts reviewable prose without executing LaTeX or following `\input` files;
-2. obtains Grammarly's official AI-detection and writing-quality scores;
-3. asks an editing model, using a scientific-writing preference by default, for a prose-only revision and rationale;
-4. rejects LaTeX-unsafe edits and score regressions;
-5. repeats until both targets are reached or a bounded stop condition fires.
+2. obtains Grammarly's official writing-quality scores and contextual AI estimate;
+3. lets a humanization reviewer interpret Grammarly measurements and validated UI observations;
+4. generates anchored humanization, grammar, concept, and ICLR-style comments without editing the source;
+5. validates every proposed Overleaf comment against the exact source and its SHA-256.
 
-It also provides a four-role scientific review panel that produces validated anchors for native Overleaf comments.
+An optional bounded copyedit mode can propose replacements, but the default outputs remain comments. Grammarly's AI estimate is reported rather than optimized.
 
 The default output is a `.review-comments.tex` file. It contains the original LaTeX unchanged plus `% TEX-REVIEW ...` comments with proposed replacements and explanations. Applying edits requires the explicit `--apply` option. Every candidate, accepted revision, score, and stop reason is saved under `.tex-reviewer/` beside the input file.
 
@@ -20,7 +20,7 @@ Grammarly's official Writing Score API returns category scores, not the individu
 issue_level = 1 - correctness_score
 ```
 
-Thus, lowering `issue_level` means raising Grammarly's correctness score. The tool reports the other writing scores as well. Grammarly's API supplies aggregate measurements, not passage-level explanations. Explanations in the comment report are explicitly labeled as scientific-editor rationale. When an already signed-in Grammarly document is available, the companion Codex skill can supervise a read-only pass over Grammarly's UI-only strong/moderate/weak pattern highlights and explanations. Those observations remain distinct from editor inference. The tool never claims that an AI-detection percentage proves authorship; Grammarly itself describes that number as an estimate.
+Thus, lowering `issue_level` means raising Grammarly's correctness score. The tool reports the other writing scores as well. Grammarly's API supplies aggregate measurements, not passage-level explanations. Explanations in the comment report are explicitly labeled as reviewer inference. When an already signed-in Grammarly document is available, the companion Codex skill can supervise a read-only pass over Grammarly's UI-only strong/moderate/weak pattern highlights and explanations. Those observations remain distinct from reviewer inference and can be supplied to the humanization reviewer. The tool never treats an AI-detection percentage as proof, an acceptance gate, or a revision target.
 
 ## Scientific-writing preference
 
@@ -74,7 +74,7 @@ tex-review panel .\paper.tex
 
 The default panel contains:
 
-- `ai-rate`: AI-pattern, attribution, and disclosure review using Grammarly only as an aggregate signal;
+- `humanize`: natural scientific voice, specificity, and flow informed by Grammarly measurements and validated observations;
 - `grammar`: minimal grammar and scientific-clarity corrections;
 - `concept`: assumptions, units, claim/evidence alignment, methods, controls, and reproducibility;
 - `iclr-overview`: an ICLR 2027-style author pre-review covering motivation, literature placement, rigor, significance, clarity, and reproducibility.
@@ -85,11 +85,21 @@ Select roles or cap comment volume:
 
 ```powershell
 tex-review panel .\paper.tex `
-  --reviewers grammar concept iclr-overview `
+  --reviewers humanize grammar concept iclr-overview `
   --max-comments-per-reviewer 8
 ```
 
-Review with the conservative defaults (scientific preference, comment-only output, at most five candidates, and stop after two consecutive rejections):
+Use passage-level feedback copied during a supervised Grammarly UI pass:
+
+```powershell
+tex-review panel .\paper.tex `
+  --reviewers humanize `
+  --grammarly-observations .\grammarly-observations.json
+```
+
+The observation file is a JSON list, or an object with an `observations` list. Each item contains an exact unique `anchor_text`, `category`, displayed `explanation`, and optional `pattern_class`. The object can also record `document_title` and `observed_at`. Grammarly observations are preserved separately from the reviewer's inference.
+
+Request bounded copyedit suggestions with the conservative defaults (scientific preference, comment-only output, at most five candidates, and stop after two consecutive rejections):
 
 ```powershell
 tex-review review .\paper.tex
@@ -103,7 +113,6 @@ Set thresholds and output explicitly:
 tex-review review .\paper.tex `
   --output .\paper.review-comments.tex `
   --preference scientific `
-  --target-ai 0.20 `
   --target-issue-level 0.05 `
   --max-attempts 5 `
   --patience 2
@@ -121,11 +130,10 @@ Use `--apply --in-place` only when you intentionally want to overwrite the input
 
 A candidate must preserve the preamble, braces, ordered environment inventory, citations, references, labels, URLs, includes, image paths, mathematical content, and numeric tokens. It is accepted only if:
 
-- AI percentage does not increase;
-- correctness deficit does not increase; and
-- at least one of those metrics improves.
+- Grammarly's correctness deficit improves; and
+- all LaTeX safety checks pass.
 
-The run stops when the requested targets are met, the attempt limit is reached, or `--patience` consecutive candidates are rejected. `--tolerance` can accommodate small score variance, but the safest default is zero.
+The AI percentage remains in the audit record for context but never controls acceptance. The run stops when the correctness target is met, the attempt limit is reached, or `--patience` consecutive candidates are rejected. `--tolerance` can accommodate small score variance, but the safest default is zero.
 
 ## Current scope
 

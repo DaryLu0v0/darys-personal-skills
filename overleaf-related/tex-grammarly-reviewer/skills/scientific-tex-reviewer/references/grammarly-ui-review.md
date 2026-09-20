@@ -18,9 +18,11 @@ Use this optional workflow only when the user has a manuscript or extracted pass
 4. Identify the matching unique substring in the local `.tex` source. Reject absent or ambiguous anchors; never use fuzzy matching for publication.
 5. Store provenance as `grammarly-ui-observation`, including the observation time and the visible document title. Label any additional scientific-editor reasoning as `reviewer-inference`.
 
+Save observations for the panel as a JSON list or as an object containing an `observations` list. Each item must contain `anchor_text`, `category`, and the displayed `explanation`; `pattern_class` is optional. Record `document_title` and `observed_at` at the object or item level when visible. Pass the file with `tex-review panel --grammarly-observations <file.json>`. The panel rejects anchors that are absent or nonunique in the exact local source.
+
 ## Revision policy
 
-Use a detector observation only to ask whether a passage is generic, repetitive, imprecise, weakly attributed, or insufficiently tied to the actual method and evidence. A good proposed revision should improve scientific specificity and the author's intended voice. It must not add facts, change numerical values, strengthen claims, or optimize mechanically for a lower detector score.
+The humanization reviewer uses an observation only to ask whether a passage is generic, repetitive, imprecise, weakly attributed, or insufficiently tied to the actual method and evidence. Its comment should improve scientific specificity and the author's intended voice. It must not add facts, change numerical values, strengthen claims, or optimize mechanically for a lower detector score.
 
 Keep proposed replacements in comment-only artifacts or Overleaf review threads. Re-score only after the author accepts or explicitly requests an applied candidate. A lower AI percentage is supporting evidence, not a guarantee of human authorship or better writing.
 

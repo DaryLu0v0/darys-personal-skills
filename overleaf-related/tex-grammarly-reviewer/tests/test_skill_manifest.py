@@ -24,7 +24,7 @@ def _load_validator():
 
 
 class FakeReviewer:
-    def review(self, latex, score, role, *, max_comments):
+    def review(self, latex, score, role, *, max_comments, grammarly_observations=()):
         return RoleReview(
             reviewer_id=role.reviewer_id,
             reviewer_label=role.label,

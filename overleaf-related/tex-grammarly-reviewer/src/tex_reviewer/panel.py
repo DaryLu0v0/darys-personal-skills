@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Protocol
 
-from .models import ReviewComment, ReviewScore, RoleReview
+from .models import GrammarlyObservation, ReviewComment, ReviewScore, RoleReview
 from .reviewers import ReviewerRole
 
 
@@ -19,6 +19,7 @@ class PanelReviewer(Protocol):
         role: ReviewerRole,
         *,
         max_comments: int,
+        grammarly_observations: tuple[GrammarlyObservation, ...] = (),
     ) -> RoleReview: ...
 
 
@@ -124,7 +125,15 @@ def generate_panel(
     roles: tuple[ReviewerRole, ...],
     output_dir: Path,
     max_comments_per_reviewer: int = 12,
+    grammarly_observations: tuple[GrammarlyObservation, ...] = (),
 ) -> PanelResult:
+    for index, observation in enumerate(grammarly_observations, start=1):
+        occurrences = source.count(observation.anchor_text)
+        if not observation.anchor_text.strip() or occurrences != 1:
+            raise ValueError(
+                f"Grammarly observation {index} anchor must be nonempty and occur exactly once; "
+                f"found {occurrences}"
+            )
     output_dir.mkdir(parents=True, exist_ok=False)
     reviews: list[dict[str, object]] = []
     warnings: list[str] = []
@@ -134,7 +143,11 @@ def generate_panel(
 
     for role in roles:
         role_review = reviewer.review(
-            source, score, role, max_comments=max_comments_per_reviewer
+            source,
+            score,
+            role,
+            max_comments=max_comments_per_reviewer,
+            grammarly_observations=grammarly_observations,
         )
         comments: list[dict[str, object]] = []
         for raw_comment in role_review.comments[:max_comments_per_reviewer]:
@@ -178,6 +191,9 @@ def generate_panel(
             "characters": len(source),
         },
         "grammarly_measurement": score.to_dict(),
+        "grammarly_observations": [
+            observation.to_dict() for observation in grammarly_observations
+        ],
         "publication": {
             "target": "overleaf-native-comments",
             "status": "not-published",

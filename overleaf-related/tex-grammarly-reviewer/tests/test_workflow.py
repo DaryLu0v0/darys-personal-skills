@@ -37,10 +37,10 @@ def test_keeps_only_improving_candidate(tmp_path: Path) -> None:
     regressed = improved.replace("example paragraph", "illustrative paragraph")
     result = review_document(
         SOURCE,
-        scorer=FakeScorer([score(0.7, 0.7), score(0.4, 0.9), score(0.5, 0.95)]),
+        scorer=FakeScorer([score(0.7, 0.7), score(0.4, 0.9), score(0.5, 0.85)]),
         editor=FakeEditor([improved, regressed]),
         run_dir=tmp_path / "run",
-        config=ReviewConfig(max_attempts=2, patience=1, target_ai=0.1, target_issue_level=0.01),
+        config=ReviewConfig(max_attempts=2, patience=1, target_issue_level=0.01),
     )
     assert result.latex == improved
     assert remove_review_comments(result.annotated_latex) == SOURCE

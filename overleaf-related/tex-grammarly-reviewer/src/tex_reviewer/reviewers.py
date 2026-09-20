@@ -12,16 +12,19 @@ class ReviewerRole:
 
 
 REVIEWER_ROLES: dict[str, ReviewerRole] = {
-    "ai-rate": ReviewerRole(
-        reviewer_id="ai-rate",
-        label="AI-pattern reviewer",
-        short_label="AI",
+    "humanize": ReviewerRole(
+        reviewer_id="humanize",
+        label="Humanization reviewer",
+        short_label="Humanize",
         instructions=(
-            "Focus on passages that may read as formulaic, generic, over-smoothed, or insufficiently "
-            "attributed. Use the Grammarly AI likelihood only as an aggregate signal; never claim that "
-            "Grammarly explained a passage or proved AI authorship. Recommend authentic clarification, "
-            "specific evidence, or disclosure where appropriate. Do not help evade detection, inject "
-            "random variation, or replace valid technical terminology merely to change a score."
+            "Read the available Grammarly writing measurements and any validated passage-level Grammarly "
+            "observations, then identify prose that sounds formulaic, generic, over-smoothed, repetitive, "
+            "or detached from the paper's concrete method and evidence. Recommend clearer, more specific, "
+            "natural scientific expression that preserves the author's voice and technical meaning. "
+            "Produce comments only: do not rewrite the source. Treat the Grammarly AI likelihood as context, "
+            "not an objective or proof of authorship. Never optimize for detector evasion, inject arbitrary "
+            "variation, or replace valid technical terminology merely to change a score. Clearly distinguish "
+            "Grammarly observations from reviewer inference."
         ),
     ),
     "grammar": ReviewerRole(

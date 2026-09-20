@@ -17,7 +17,7 @@ Every publishable comment contains the source filename, exact anchor text, chara
 
 | Role | Primary focus |
 |---|---|
-| AI-pattern reviewer | Aggregate Grammarly AI signal, formulaic phrasing, attribution, and disclosure; never detector evasion |
+| Humanization reviewer | Grammarly-informed natural scientific voice, specificity, flow, and formulaic phrasing; comments only and never detector evasion |
 | Grammar and clarity reviewer | Minimal grammar, punctuation, terminology, and sentence-level clarity corrections |
 | Scientific concept reviewer | Definitions, assumptions, units, claim/evidence alignment, methods, controls, uncertainty, and reproducibility |
 | ICLR overview reviewer | Problem, motivation, literature placement, claim support, rigor, significance, clarity, and reproducibility using the ICLR 2027 reviewer guide |
@@ -39,4 +39,4 @@ Posting comments represents the user to collaborators. The publisher must show a
 
 ## Reviewer identity limitation
 
-Overleaf attributes a native comment to the account currently signed in. A single logged-in account cannot honestly appear as four different human authors. This design uses clear role labels—`[AI-pattern reviewer]`, `[Grammar and clarity reviewer]`, and so on—inside comments. Truly different author identities require separate named Overleaf collaborators and deliberate account ownership; the tool does not create or impersonate those accounts.
+Overleaf attributes a native comment to the account currently signed in. A single logged-in account cannot honestly appear as four different human authors. This design uses clear role labels—`[Humanization reviewer]`, `[Grammar and clarity reviewer]`, and so on—inside comments. Truly different author identities require separate named Overleaf collaborators and deliberate account ownership; the tool does not create or impersonate those accounts.

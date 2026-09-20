@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tex-grammarly-reviewer"
-version = "0.1.0"
-description = "Iteratively revise LaTeX prose against Grammarly AI-detection and writing-quality scores."
+version = "0.2.0"
+description = "Review scientific LaTeX with Grammarly-informed, comment-only feedback."
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}

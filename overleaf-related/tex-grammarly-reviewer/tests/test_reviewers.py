@@ -2,11 +2,16 @@ from tex_reviewer.reviewers import DEFAULT_REVIEWERS, REVIEWER_ROLES, get_review
 
 
 def test_default_panel_contains_four_distinct_roles() -> None:
-    assert DEFAULT_REVIEWERS == ("ai-rate", "grammar", "concept", "iclr-overview")
+    assert DEFAULT_REVIEWERS == ("humanize", "grammar", "concept", "iclr-overview")
     assert set(DEFAULT_REVIEWERS) == set(REVIEWER_ROLES)
+
+
+def test_humanize_role_is_comment_only_and_not_detector_driven() -> None:
+    instructions = REVIEWER_ROLES["humanize"].instructions
+    assert "Produce comments only" in instructions
+    assert "not an objective or proof of authorship" in instructions
 
 
 def test_role_selection_preserves_requested_order() -> None:
     roles = get_reviewer_roles(("concept", "grammar"))
     assert [role.reviewer_id for role in roles] == ["concept", "grammar"]
-

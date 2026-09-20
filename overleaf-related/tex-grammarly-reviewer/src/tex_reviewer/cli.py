@@ -9,6 +9,7 @@ import sys
 
 from .clients import GrammarlyClient, OpenAIEditor, OpenAIPanelReviewer, ServiceError
 from .latex import latex_to_plain_text
+from .models import GrammarlyObservation
 from .panel import generate_panel
 from .reviewers import DEFAULT_REVIEWERS, REVIEWER_ROLES, get_reviewer_roles
 from .workflow import ReviewConfig, review_document
@@ -45,6 +46,11 @@ def _parser() -> argparse.ArgumentParser:
         default=list(DEFAULT_REVIEWERS),
     )
     panel.add_argument("--max-comments-per-reviewer", type=int, default=12)
+    panel.add_argument(
+        "--grammarly-observations",
+        type=Path,
+        help="validated JSON observations copied from a supervised Grammarly UI pass",
+    )
 
     review = subparsers.add_parser("review", help="Iteratively revise and rescore a .tex file")
     review.add_argument("tex", type=Path)
@@ -69,7 +75,6 @@ def _parser() -> argparse.ArgumentParser:
     )
     review.add_argument("--max-attempts", type=int, default=5)
     review.add_argument("--patience", type=int, default=2)
-    review.add_argument("--target-ai", type=_unit_interval, default=0.20)
     review.add_argument("--target-issue-level", type=_unit_interval, default=0.05)
     review.add_argument("--tolerance", type=_unit_interval, default=0.0)
     return parser
@@ -92,6 +97,59 @@ def _run_dir(tex: Path) -> Path:
     return candidate
 
 
+def _read_grammarly_observations(
+    path: Path | None, source: str
+) -> tuple[GrammarlyObservation, ...]:
+    if path is None:
+        return ()
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    items = raw.get("observations") if isinstance(raw, dict) else raw
+    default_title = raw.get("document_title", "") if isinstance(raw, dict) else ""
+    default_observed_at = raw.get("observed_at", "") if isinstance(raw, dict) else ""
+    if not isinstance(default_title, str) or not isinstance(default_observed_at, str):
+        raise ValueError("document_title and observed_at must be strings")
+    if not isinstance(items, list):
+        raise ValueError(
+            "Grammarly observations must be a JSON list or an object with an observations list"
+        )
+    observations: list[GrammarlyObservation] = []
+    for index, item in enumerate(items, start=1):
+        if not isinstance(item, dict):
+            raise ValueError(f"Grammarly observation {index} must be an object")
+        required = ("anchor_text", "category", "explanation")
+        if any(not isinstance(item.get(key), str) or not item[key].strip() for key in required):
+            raise ValueError(
+                f"Grammarly observation {index} requires nonempty anchor_text, category, and explanation"
+            )
+        anchor = item["anchor_text"]
+        occurrences = source.count(anchor)
+        if occurrences != 1:
+            raise ValueError(
+                f"Grammarly observation {index} anchor must occur exactly once; found {occurrences}"
+            )
+        pattern_class = item.get("pattern_class", "")
+        document_title = item.get("document_title", default_title)
+        observed_at = item.get("observed_at", default_observed_at)
+        if not all(
+            isinstance(value, str)
+            for value in (pattern_class, document_title, observed_at)
+        ):
+            raise ValueError(
+                f"Grammarly observation {index} optional metadata must be strings"
+            )
+        observations.append(
+            GrammarlyObservation(
+                anchor_text=anchor,
+                category=item["category"],
+                explanation=item["explanation"],
+                pattern_class=pattern_class,
+                document_title=document_title,
+                observed_at=observed_at,
+            )
+        )
+    return tuple(observations)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     try:
@@ -107,6 +165,9 @@ def main(argv: list[str] | None = None) -> int:
                 raise ValueError("--max-comments-per-reviewer must be positive")
             score = scorer.assess(latex_to_plain_text(source))
             reviewer = OpenAIPanelReviewer(model=args.model)
+            observations = _read_grammarly_observations(
+                args.grammarly_observations, source
+            )
             output_dir = (
                 args.output_dir.resolve()
                 if args.output_dir
@@ -120,6 +181,7 @@ def main(argv: list[str] | None = None) -> int:
                 roles=get_reviewer_roles(tuple(args.reviewers)),
                 output_dir=output_dir,
                 max_comments_per_reviewer=args.max_comments_per_reviewer,
+                grammarly_observations=observations,
             )
             print(
                 json.dumps(
@@ -128,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
                         "markdown": str(result.markdown_path),
                         "accepted_comments": result.accepted_comments,
                         "rejected_comments": result.rejected_comments,
+                        "grammarly_observations": len(observations),
                         "publication_status": "not-published",
                     },
                     indent=2,
@@ -153,7 +216,6 @@ def main(argv: list[str] | None = None) -> int:
             config=ReviewConfig(
                 max_attempts=args.max_attempts,
                 patience=args.patience,
-                target_ai=args.target_ai,
                 target_issue_level=args.target_issue_level,
                 tolerance=args.tolerance,
                 preference=args.preference,

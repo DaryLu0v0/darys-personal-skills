@@ -26,6 +26,20 @@ class ReviewScore:
 
 
 @dataclass(frozen=True)
+class GrammarlyObservation:
+    anchor_text: str
+    category: str
+    explanation: str
+    pattern_class: str = ""
+    document_title: str = ""
+    observed_at: str = ""
+    provenance: str = "grammarly-ui-observation"
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class EditNote:
     original: str
     replacement: str
@@ -78,11 +92,7 @@ def score_is_acceptable(
     tolerance: float = 0.0,
     minimum_improvement: float = 1e-6,
 ) -> bool:
-    """Require Pareto improvement in AI rate and correctness deficit."""
-    ai_ok = candidate.ai_generated <= previous.ai_generated + tolerance
+    """Accept a candidate only when Grammarly's correctness deficit improves."""
     issue_ok = candidate.issue_level <= previous.issue_level + tolerance
-    improved = (
-        candidate.ai_generated < previous.ai_generated - minimum_improvement
-        or candidate.issue_level < previous.issue_level - minimum_improvement
-    )
-    return ai_ok and issue_ok and improved
+    improved = candidate.issue_level < previous.issue_level - minimum_improvement
+    return issue_ok and improved

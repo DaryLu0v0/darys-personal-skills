@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from tex_reviewer.models import ReviewComment, ReviewScore, RoleReview
+from tex_reviewer.models import GrammarlyObservation, ReviewComment, ReviewScore, RoleReview
 from tex_reviewer.panel import anchor_comment, generate_panel
 from tex_reviewer.reviewers import REVIEWER_ROLES
 
@@ -29,7 +29,7 @@ def comment(anchor: str) -> ReviewComment:
 
 
 class FakeReviewer:
-    def review(self, latex, score, role, *, max_comments):
+    def review(self, latex, score, role, *, max_comments, grammarly_observations=()):
         valid = comment("The method is robust in every setting.")
         valid = ReviewComment(
             **{
@@ -65,6 +65,12 @@ def test_anchor_comment_rejects_nonunique_text() -> None:
 
 
 def test_generate_panel_writes_validated_manifest(tmp_path: Path) -> None:
+    observation = GrammarlyObservation(
+        anchor_text="The method is robust in every setting.",
+        category="clarity",
+        explanation="The claim may be too broad for the stated evidence.",
+        pattern_class="moderate",
+    )
     result = generate_panel(
         SOURCE,
         filename="paper.tex",
@@ -73,15 +79,40 @@ def test_generate_panel_writes_validated_manifest(tmp_path: Path) -> None:
         roles=(REVIEWER_ROLES["concept"],),
         output_dir=tmp_path / "panel",
         max_comments_per_reviewer=4,
+        grammarly_observations=(observation,),
     )
     assert result.accepted_comments == 1
     assert result.rejected_comments == 1
     assert result.manifest_path.exists()
     assert result.markdown_path.exists()
     assert result.manifest["publication"]["status"] == "not-published"
+    assert result.manifest["grammarly_observations"] == [observation.to_dict()]
     saved = result.manifest["reviews"][0]["comments"][0]
     assert saved["comment_id"] == "CONCEPT-001"
     assert saved["filename"] == "paper.tex"
     assert "[Scientific concept reviewer]" in saved["overleaf_comment"]
     assert "inference, not a verified fact" in saved["overleaf_comment"]
 
+
+def test_generate_panel_rejects_unanchored_grammarly_observation(tmp_path: Path) -> None:
+    observation = GrammarlyObservation(
+        anchor_text="Missing sentence.",
+        category="clarity",
+        explanation="This sentence is unclear.",
+    )
+    output_dir = tmp_path / "panel"
+    try:
+        generate_panel(
+            SOURCE,
+            filename="paper.tex",
+            score=score(),
+            reviewer=FakeReviewer(),
+            roles=(REVIEWER_ROLES["humanize"],),
+            output_dir=output_dir,
+            grammarly_observations=(observation,),
+        )
+    except ValueError as exc:
+        assert "occur exactly once" in str(exc)
+    else:
+        raise AssertionError("unanchored Grammarly observation was accepted")
+    assert not output_dir.exists()
