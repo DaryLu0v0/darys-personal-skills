@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper Library"
+  short_description: "Save, retrieve, and synthesize academic papers"
+  default_prompt: "Use $paper-library to save this paper, read it with me, and make it easy to retrieve later."
