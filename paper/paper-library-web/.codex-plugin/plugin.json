@@ -1,0 +1,39 @@
+{
+  "name": "paper-library-web",
+  "version": "0.2.0",
+  "description": "Use a private paper library from ChatGPT and Codex through an MCP connection.",
+  "author": {
+    "name": "DaryLu0v0",
+    "email": "Darui.lu@duke.edu",
+    "url": "https://github.com/DaryLu0v0"
+  },
+  "homepage": "https://github.com/DaryLu0v0/darys-personal-skills/tree/main/paper/paper-library-web",
+  "repository": "https://github.com/DaryLu0v0/darys-personal-skills",
+  "license": "MIT",
+  "keywords": [
+    "papers",
+    "literature-review",
+    "research",
+    "obsidian",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Paper Library Web",
+    "shortDescription": "Read and maintain your private paper library.",
+    "longDescription": "Save, retrieve, review, and brainstorm from a private Obsidian-compatible paper library through focused MCP tools.",
+    "developerName": "DaryLu0v0",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Save this paper and create evidence-linked reading notes.",
+      "Find papers in my library about this topic.",
+      "Review this field using my saved paper library."
+    ],
+    "brandColor": "#5C43A8"
+  },
+  "mcpServers": "./.mcp.json"
+}

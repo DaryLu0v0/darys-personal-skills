@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "paper-library-web",
+  "version": "0.2.0",
+  "description": "Use a private paper library from ChatGPT and Codex through an MCP connection.",
+  "author": {
+    "name": "DaryLu0v0",
+    "email": "Darui.lu@duke.edu",
+    "url": "https://github.com/DaryLu0v0"
+  },
+  "homepage": "https://github.com/DaryLu0v0/darys-personal-skills/tree/main/paper/paper-library-web",
+  "repository": "https://github.com/DaryLu0v0/darys-personal-skills",
+  "license": "MIT",
+  "keywords": [
+    "papers",
+    "literature-review",
+    "research",
+    "obsidian",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

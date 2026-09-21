@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "paper-library": {
+      "command": "python",
+      "args": [
+        "./server/paper_library_mcp.py"
+      ],
+      "env_vars": [
+        "PAPER_LIBRARY_CONFIG",
+        "PAPER_LIBRARY_ENGINE"
+      ],
+      "startup_timeout_sec": 30,
+      "tool_timeout_sec": 120
+    }
+  }
+}
