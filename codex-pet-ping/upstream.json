@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "created": "2026-10-13",
+  "upstream": {
+    "repository": "https://github.com/darrenprx/lolPing.git",
+    "tag": "v0.5.1",
+    "commit": "b1181e9ea53972992a503d078fdb06792ffa087e"
+  },
+  "workflowReference": "https://github.com/norvancc/super-ping",
+  "hashEncoding": "SHA-256 of UTF-8 text with CRLF normalized to LF",
+  "patch": {
+    "path": "patches/lolping-pet.patch",
+    "sha256": "4c3ab505ab5dd595c6f55b6c905a5390d85c1cb3603c4e9047d648f55b1093a0"
+  },
+  "files": [
+    {
+      "path": ".gitignore",
+      "overlay": false,
+      "sha256": "91f79266121f233e3024f3ee1de11f16ca420a5f986ccf6dbad49284d37cb4ff"
+    },
+    {
+      "path": "README.md",
+      "overlay": false,
+      "sha256": "0ad5f378323243e177ca4d94d32f38b195ed30bb3b4f7508d91441639b98f044"
+    },
+    {
+      "path": "package.json",
+      "overlay": false,
+      "sha256": "4c8eba363e45e30066b8ab2dda96415feeed8d9a6deb20b8fd6756e23db7ed49"
+    },
+    {
+      "path": "src/main/index.ts",
+      "overlay": false,
+      "sha256": "97e15ef8af86e09f3c5dedea464a2067d9293f51bdcf0f45e6173dffc52644ee"
+    },
+    {
+      "path": "src/main/overlayManager.ts",
+      "overlay": false,
+      "sha256": "66c7b17c7938c0f1c2fc014956ea450120f0d4068a8841beedc2637aaafc182e"
+    },
+    {
+      "path": "src/main/paths.ts",
+      "overlay": false,
+      "sha256": "80e8ef6b6713efe3c7322b0b3f9cb42f44abb06f649a2b35e89631a2c31ef19f"
+    },
+    {
+      "path": "src/renderer/settings/App.tsx",
+      "overlay": false,
+      "sha256": "7ec9184305861907fa171d4bc82d7e3f8ecd7479d5e808481f699ed6ecc03c05"
+    },
+    {
+      "path": "src/shared/i18n.ts",
+      "overlay": false,
+      "sha256": "06976ff35dacdab2cb2c4582c2c3e1eb795683554a673bedb1e2194b69f3429f"
+    },
+    {
+      "path": "src/shared/settings.ts",
+      "overlay": false,
+      "sha256": "80ed0db97c0a7e592fe47dd7517bbf8fa90e3e751b0a42223821011dad8b3e58"
+    },
+    {
+      "path": "tests/main/overlayManager.test.ts",
+      "overlay": false,
+      "sha256": "c4428832f2e3c5802cd1af3368788b0e46fc898d9e527662f79d0d581fe8de86"
+    },
+    {
+      "path": "tests/shared/settings.test.ts",
+      "overlay": false,
+      "sha256": "7b8e72cff8a310baf81f82fbb1703b378588593118c1451d70d95a68eb951ed3"
+    },
+    {
+      "path": "native/pet-bridge/Program.cs",
+      "overlay": true,
+      "sha256": "ebcc8babd098387fde58f852f42a745657e19a1575202707926adfa6f3fb676f"
+    },
+    {
+      "path": "native/pet-bridge/build.mjs",
+      "overlay": true,
+      "sha256": "64178a1d4532b251ba300d62afab837fdabb16e22dfe6324f1fba47fa5e7f63f"
+    },
+    {
+      "path": "src/main/petBridge.ts",
+      "overlay": true,
+      "sha256": "7c0cddd0ddd3ed2664d90314e55e21a0573f80d5eae4b690a373098854e6b107"
+    },
+    {
+      "path": "src/main/petQuestion.ts",
+      "overlay": true,
+      "sha256": "8da7c9436baa32d3ccdf9556ad2775f002444d35982d6304b1b16239e1534a19"
+    },
+    {
+      "path": "tests/main/petQuestion.test.ts",
+      "overlay": true,
+      "sha256": "55246b0ef3214f01775f38744825950169ab010e4f3bcd77f86907bc533c0129"
+    }
+  ],
+  "updated": "2026-10-13",
+  "petTrigger": "needvision"
+}

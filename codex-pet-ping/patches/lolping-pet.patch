@@ -1,0 +1,332 @@
+diff --git a/.gitignore b/.gitignore
+index 0aebe62..f969c01 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -4,6 +4,7 @@ dist/
+ release/
+ site-dist/
+ native/hook-helper/build/
++native/pet-bridge/build/
+ *.log
+ .DS_Store
+ tools/extract-assets/.cache/
+diff --git a/README.md b/README.md
+index 2f2a55b..0f75e84 100644
+--- a/README.md
++++ b/README.md
+@@ -68,6 +68,24 @@ The wheel, from the top going clockwise: Danger, Push, On My Way, All In, Assist
+ 
+ ## Settings
+ 
++### Ask your existing Codex / ChatGPT pet (Windows, local extension)
++
++Enable **Settings → Pings & sound → Ask your pet with a Need Vision ping**. Keep your existing desktop pet visible and signed in.
++Hold **Alt**, drag down-left to the green **Need Vision** icon on the default wheel, and release both the mouse and Alt. lolPing captures the display where
++the ping started, circles that point, and asks the pet what the marked item means. The reply appears in the pet's own
++activity bubble; click it to read the full answer. It uses your existing ChatGPT account and requires no API key.
++
++Only your own **Need Vision** pings send screenshots; `? / Enemy Missing` is a normal ping. Settings previews and room members' pings do not. The screenshot includes
++everything visible on the pinged display. Temporary capture files are removed after the handoff, while the image and
++question remain in the chat created by the pet. Existing pet drafts are preserved, and repeated pings during handoff
++are ignored. If the handoff fails, lolPing shows the reason; check the pet for a partial draft before retrying.
++
++This uses the documented **Windows + Alt + P** shortcut and ordinary Windows accessibility/keyboard input, so it
++depends on the pet UI and shortcut staying compatible. Tested with desktop version **26.928.4866.0**. It adds no
++replacement pet or answer window. An upstream lolPing update may replace this local extension.
++
++The Windows build also compiles `native/pet-bridge` using the .NET Framework compiler included with Windows.
++
+ <img src="docs/media/settings.png" width="760" alt="The lolPing settings window, with sections for trigger, toggle, pings and sound, wheel, emotes, room and app">
+ 
+ - **Trigger key:** Alt, Ctrl, Shift, Win, Caps Lock, Mouse 4, Mouse 5 or any other key (on a Mac: Option, Control, Shift, Command, Mouse 4, Mouse 5 or any other key). The custom key won't type in other apps while pinging is on.
+diff --git a/package.json b/package.json
+index c08a347..e0fc669 100644
+--- a/package.json
++++ b/package.json
+@@ -16,7 +16,8 @@
+     "start": "electron-vite preview",
+     "typecheck": "tsc --noEmit",
+     "test": "vitest run",
+-    "build:helper": "node native/hook-helper/run.mjs build",
++    "build:helper": "node native/hook-helper/run.mjs build && node native/pet-bridge/build.mjs",
++    "build:pet": "node native/pet-bridge/build.mjs",
+     "test:helper": "node native/hook-helper/run.mjs test",
+     "dist": "npm run build:helper && electron-vite build && electron-builder --win --publish never",
+     "dist:mac": "npm run build:helper && electron-vite build && electron-builder --mac --arm64 --publish never",
+@@ -53,7 +54,10 @@
+     "win": {
+       "target": [{ "target": "nsis", "arch": ["x64"] }],
+       "icon": "build/icon.ico",
+-      "extraResources": [{ "from": "native/hook-helper/build/hook-helper.exe", "to": "hook-helper.exe" }]
++      "extraResources": [
++        { "from": "native/hook-helper/build/hook-helper.exe", "to": "hook-helper.exe" },
++        { "from": "native/pet-bridge/build/pet-bridge.exe", "to": "pet-bridge.exe" }
++      ]
+     },
+     "nsis": {
+       "oneClick": false,
+diff --git a/src/main/index.ts b/src/main/index.ts
+index b51b326..b77e937 100644
+--- a/src/main/index.ts
++++ b/src/main/index.ts
+@@ -18,7 +18,9 @@ import { LanTransport } from './lanTransport';
+ import { RELAYS } from './relays';
+ import { RelayTransport } from './relayTransport';
+ import { OverlayManager, type SharedEmote, type SharedPing } from './overlayManager';
+-import { assetPath, buildResourcePath, helperExePath, IS_MAC, PLATFORM, settingsDir } from './paths';
++import { assetPath, buildResourcePath, helperExePath, IS_MAC, PLATFORM, settingsDir, petBridgeExePath } from './paths';
++import { petRequest, PetQuestions } from './petQuestion';
++import { sendPetQuestion } from './petBridge';
+ import { deriveRoomKeys } from './roomCrypto';
+ import { RoomManager, type RoomToast } from './roomManager';
+ import { registerSettingsIpc } from './settingsIpc';
+@@ -87,10 +89,32 @@ function start(): void {
+   let enabled = settings.enabledOnStart;
+   let quitting = false; // read by pushStatus: once true, the tray and overlays are gone
+   let capturing = false; // the settings page is listening for a key, so the helper must stay suspended
++  let petAsking = false;
++  const petAbort = new AbortController();
+ 
+   const overlays = new OverlayManager(overlaySettings(settings), (ref, remote) => resolveEmoteArt(ref, settings.customEmotes, remote));
+   overlays.start();
+   const bridge = new InputBridge({ command: helperExePath() });
++  const petQuestions = new PetQuestions({
++    enabled: () => settings.petAskEnabled && enabled && !quitting,
++    platform: process.platform,
++    request: (p) => {
++      const display = screen.getAllDisplays().find((d) => d.id === p.displayId);
++      if (!display) throw new Error('The pinged display was disconnected.');
++      return petRequest(p, display.bounds, screen.dipToScreenRect(null, display.bounds), text().lang === 'zh-CN');
++    },
++    send: (request) => sendPetQuestion(petBridgeExePath(), app.getPath('temp'), request, petAbort.signal),
++    active: (on) => {
++      petAsking = on;
++      if (quitting) return;
++      bridge.send({ type: 'suspend', on: on || capturing });
++      overlays.setCaptureHidden(on);
++    },
++    error: (message) => {
++      console.warn('[pet]', message);
++      if (!quitting) overlays.toast(text().petAskFailed, message);
++    },
++  });
+ 
+   // Updates: only in an installed build, or in a development build pointed at a test server with LOLPING_UPDATE_TEST_URL.
+   const testUrl = process.env.LOLPING_UPDATE_TEST_URL || undefined;
+@@ -250,6 +274,9 @@ function start(): void {
+   overlays.on('displays', pushRoom);
+   room.on('remotePing', (p) => overlays.spawnRemote(p));
+   overlays.on('shared', (p: SharedPing) => {
++    void petQuestions.ask(p).then((result) => {
++      if (result !== 'ignored') console.log('[pet]', result);
++    });
+     const shared = toShared(overlays.numbered(), p.displayId, p.x, p.y);
+     if (shared) room.sendPing(p.id, shared);
+   });
+@@ -299,12 +326,13 @@ function start(): void {
+   }
+ 
+   bridge.on('event', (ev) => {
++    if (process.env.LOLPING_DEBUG_INPUT === '1') console.log('[input]', ev.type);
+     if (ev.type === 'toggled') setEnabled(ev.enabled);
+     else if (ev.type === 'ready') {
+       // A restarted helper starts unsuspended: re-apply an active key capture.
+-      if (capturing) bridge.send({ type: 'suspend', on: true });
++      if (capturing || petAsking) bridge.send({ type: 'suspend', on: true });
+     } else if (ev.type === 'error') console.warn('[helper]', ev.code ?? '', ev.message);
+-    else overlays.handle(ev);
++    else if (!petAsking) overlays.handle(ev);
+   });
+   bridge.on('status', (s: HelperStatus) => {
+     // A helper that is starting or has stopped can no longer send the cancel that dismisses a wheel left on screen.
+@@ -354,7 +382,7 @@ function start(): void {
+     retryHelper: startHelper,
+     setCapturing: (on) => {
+       capturing = on;
+-      bridge.send({ type: 'suspend', on });
++      bridge.send({ type: 'suspend', on: on || petAsking });
+     },
+     openAccessibility: () => {
+       systemPreferences.isTrustedAccessibilityClient(true); // adds lolPing to the list and shows the system prompt
+@@ -381,7 +409,7 @@ function start(): void {
+   onSettingsWindowGone(() => {
+     if (!capturing) return;
+     capturing = false;
+-    bridge.send({ type: 'suspend', on: false });
++    bridge.send({ type: 'suspend', on: petAsking });
+   });
+ 
+   bridge.send(configCommand(settings, enabled));
+@@ -408,6 +436,7 @@ function start(): void {
+   app.on('before-quit', (event) => {
+     if (quitting) return;
+     quitting = true;
++    petAbort.abort();
+     event.preventDefault();
+     updater?.stop(); // aborts a download and drops a check in flight; an install that is quitting the app is left alone
+     room.quit(); // says bye, so the others see "left" instead of waiting for a timeout
+diff --git a/src/main/overlayManager.ts b/src/main/overlayManager.ts
+index 3a7f83c..f182d2c 100644
+--- a/src/main/overlayManager.ts
++++ b/src/main/overlayManager.ts
+@@ -41,6 +41,7 @@ export class OverlayManager extends EventEmitter {
+   private numberedList: NumberedDisplay[] = [];
+   private wheelDisplay: number | null = null;
+   private wheelKind: WheelKind = 'ping';
++  private captureHidden = false;
+ 
+   /** `resolveArt` says what an emote looks like: `remote` is true for a room member's, whose files may be missing here. */
+   constructor(private settings: OverlaySettings, private readonly resolveArt: (ref: EmoteRef, remote: boolean) => EmoteArt) {
+@@ -150,6 +151,18 @@ export class OverlayManager extends EventEmitter {
+     this.send(screen.getPrimaryDisplay().id, 'toast:show', { title, body });
+   }
+ 
++  /** Keep the wheel and ping animation out of the screenshot, without focusing another app. */
++  setCaptureHidden(hidden: boolean): void {
++    this.captureHidden = hidden;
++    if (hidden) this.cancelWheel();
++    for (const w of this.windows.values()) {
++      if (!w.isDestroyed()) {
++        if (hidden) w.hide();
++        else w.showInactive();
++      }
++    }
++  }
++
+   destroy(): void {
+     for (const w of this.windows.values()) if (!w.isDestroyed()) w.destroy();
+     this.windows.clear();
+@@ -224,7 +237,7 @@ export class OverlayManager extends EventEmitter {
+     if (IS_MAC) win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true });
+     win.webContents.on('did-finish-load', () => win.webContents.send('overlay:settings', this.settings));
+     win.once('ready-to-show', () => {
+-      win.showInactive();
++      if (!this.captureHidden) win.showInactive();
+       win.setBounds(d.bounds); // re-apply: mixed-DPI setups can size the first frame wrong
+     });
+     void loadPage(win, 'overlay');
+diff --git a/src/main/paths.ts b/src/main/paths.ts
+index 72dab6e..4a33fcf 100644
+--- a/src/main/paths.ts
++++ b/src/main/paths.ts
+@@ -10,6 +10,10 @@ export const IS_MAC = PLATFORM === 'mac';
+ 
+ const HELPER_FILE = IS_MAC ? 'hook-helper' : 'hook-helper.exe';
+ 
++export const petBridgeExePath = (): string => app.isPackaged
++  ? join(process.resourcesPath, 'pet-bridge.exe')
++  : join(app.getAppPath(), 'native', 'pet-bridge', 'build', 'pet-bridge.exe');
++
+ export const helperExePath = (): string =>
+   app.isPackaged
+     ? join(process.resourcesPath, HELPER_FILE)
+diff --git a/src/renderer/settings/App.tsx b/src/renderer/settings/App.tsx
+index 191cb94..f6440b6 100644
+--- a/src/renderer/settings/App.tsx
++++ b/src/renderer/settings/App.tsx
+@@ -190,6 +190,8 @@ function SettingsPage({ settings: s, status, update }: { settings: Settings; sta
+         <SwitchRow icon={<SpeakerMute24Regular />} title={t.mute} checked={s.muted} onChange={(v) => void update({ muted: v })} />
+         <SwitchRow icon={<MusicNote224Regular />} title={t.tickSound} description={t.tickSoundDesc}
+           checked={s.tickSound} onChange={(v) => void update({ tickSound: v })} />
++        {!MAC && <SwitchRow icon={<Emoji24Regular />} title={t.petAsk} description={t.petAskDesc}
++          checked={s.petAskEnabled} onChange={(v) => void update({ petAskEnabled: v })} />}
+ 
+         <div className="section" id="wheel">{t.navWheel}</div>
+         <WheelEditor wheel={s.wheel} center={s.clickPingId} centerOn={s.clickPing} trigger={trigger} pool={pingPool}
+diff --git a/src/shared/i18n.ts b/src/shared/i18n.ts
+index be36c81..f72d80d 100644
+--- a/src/shared/i18n.ts
++++ b/src/shared/i18n.ts
+@@ -58,6 +58,9 @@ const en = {
+   mute: 'Mute ping sounds',
+   tickSound: 'Wheel tick sound',
+   tickSoundDesc: 'Plays a quiet click when hovering a new slice',
++  petAsk: 'Ask your pet with a Need Vision ping',
++  petAskDesc: 'Sends a screenshot of the pinged display with the point circled to your existing Codex / ChatGPT pet. Keep the pet visible and signed in.',
++  petAskFailed: 'Could not ask your pet',
+   wheelTitle: 'Customize the wheel',
+   wheelDesc: (trigger: string) => `Drag a ping onto a slice to put it there. Drop it on the centre to make it the ${trigger} + click ping.`,
+   wheelReset: 'Reset to default',
+@@ -305,6 +308,9 @@ const zh: Strings = {
+   mute: '静音信号声音',
+   tickSound: '轮盘提示音',
+   tickSoundDesc: '悬停到新的扇区时播放轻微的点击声',
++  petAsk: '用“需要视野”信号询问宠物',
++  petAskDesc: '截取信号所在屏幕，圈出该位置并发送给现有的 Codex / ChatGPT 宠物。请保持宠物可见并已登录。',
++  petAskFailed: '未能询问宠物',
+   wheelTitle: '自定义轮盘',
+   wheelDesc: (trigger) => `把信号拖到扇区上即可放置。拖到中心则设为 ${trigger} + 单击发送的信号。`,
+   wheelReset: '恢复默认',
+diff --git a/src/shared/settings.ts b/src/shared/settings.ts
+index ca1f55b..0d986cb 100644
+--- a/src/shared/settings.ts
++++ b/src/shared/settings.ts
+@@ -41,6 +41,8 @@ export interface Settings {
+   volume: number;
+   muted: boolean;
+   tickSound: boolean;
++  /** Send this machine's Need Vision pings as marked screenshots to the existing Windows pet. */
++  petAskEnabled: boolean;
+   launchAtStartup: boolean;
+   language: LanguagePref;
+   /** Shown under your pings on other people's screens. */
+@@ -92,6 +94,7 @@ export const DEFAULT_SETTINGS: Settings = {
+   volume: 70,
+   muted: false,
+   tickSound: true,
++  petAskEnabled: false,
+   launchAtStartup: false,
+   language: 'auto',
+   displayName: 'Player',
+@@ -123,7 +126,7 @@ export const LIMITS = {
+ 
+ type NumKey = keyof typeof LIMITS;
+ type BoolKey = 'enabledOnStart' | 'clickPing' | 'gameCheck' | 'muted' | 'tickSound' | 'launchAtStartup' | 'allowInternet' | 'rejoinRoom' | 'roomMuted'
+-  | 'emoteClick' | 'emoteSound' | 'autoUpdateCheck';
++  | 'emoteClick' | 'emoteSound' | 'autoUpdateCheck' | 'petAskEnabled';
+ 
+ const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v);
+ const isVk = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 1 && (v as number) <= 254;
+@@ -230,6 +233,7 @@ export function normalizeSettings(raw: unknown, platform: Platform = 'win', iden
+     volume: num(r.volume, 'volume'),
+     muted: bool(r.muted, 'muted'),
+     tickSound: bool(r.tickSound, 'tickSound'),
++    petAskEnabled: platform === 'win' && bool(r.petAskEnabled, 'petAskEnabled'),
+     launchAtStartup: bool(r.launchAtStartup, 'launchAtStartup'),
+     language: (LANGUAGE_PREFS as readonly unknown[]).includes(r.language) ? (r.language as LanguagePref) : DEFAULT_SETTINGS.language,
+     displayName: typeof r.displayName === 'string' ? sanitizeName(r.displayName, fallbackName) : fallbackName,
+diff --git a/tests/main/overlayManager.test.ts b/tests/main/overlayManager.test.ts
+index 9676331..8bb583f 100644
+--- a/tests/main/overlayManager.test.ts
++++ b/tests/main/overlayManager.test.ts
+@@ -153,6 +153,13 @@ describe('OverlayManager emote reports from the overlay', () => {
+ });
+ 
+ describe('OverlayManager remote and preview emotes', () => {
++  it('never emits a local question event for a remote ping or settings preview', () => {
++    const local = vi.fn();
++    mgr.on('shared', local);
++    mgr.previewPing('needvision');
++    mgr.spawnRemote({ displayId: 1, x: 50, y: 60, id: 'needvision', tag: { name: 'Bob', color: 2 } });
++    expect(local).not.toHaveBeenCalled();
++  });
+   it('shows a room member\'s emote on the target display with their tag, and clears theirs on the others', () => {
+     mgr.spawnRemoteEmote({ displayId: 2, x: 5, y: 6, ref: 'gg_heart', peer: 'peer-1', tag: { name: 'Bob', color: 2 } });
+     expect(resolveArt).toHaveBeenCalledWith('gg_heart', true);
+diff --git a/tests/shared/settings.test.ts b/tests/shared/settings.test.ts
+index cad01d0..09bdef7 100644
+--- a/tests/shared/settings.test.ts
++++ b/tests/shared/settings.test.ts
+@@ -8,6 +8,12 @@ import {
+ } from '../../src/shared/settings';
+ 
+ describe('normalizeSettings', () => {
++  it('keeps pet questions opt-in and available only on Windows', () => {
++    expect(normalizeSettings({}).petAskEnabled).toBe(false);
++    expect(normalizeSettings({ petAskEnabled: true }).petAskEnabled).toBe(true);
++    expect(normalizeSettings({ petAskEnabled: 'yes' }).petAskEnabled).toBe(false);
++    expect(normalizeSettings({ petAskEnabled: true }, 'mac').petAskEnabled).toBe(false);
++  });
+   it('returns defaults for missing or non-object input', () => {
+     for (const raw of [undefined, null, 42, 'x', [1, 2]]) expect(normalizeSettings(raw)).toEqual(DEFAULT_SETTINGS);
+   });
