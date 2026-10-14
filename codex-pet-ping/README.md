@@ -16,6 +16,14 @@ The question asks what the item at the orange circle means or does. The extensio
 
 This setting defaults to off in fresh installations. It was enabled in the local installation tested on 2026-10-13.
 
+## Start automatically with Windows
+
+In lolPing, open **Settings → App** and enable **Launch at Windows startup**. Keep **Start enabled** on so the ping wheel is available after sign-in.
+
+Windows starts the installed app in the background with `--hidden`; the settings window does not open at each sign-in. The app's startup preference is `launchAtStartup`. Its Windows sign-in entry is named `com.lolping.app` under the current user's `Software\Microsoft\Windows\CurrentVersion\Run` registry key. Disabling the switch removes that entry.
+
+Startup was enabled and verified for the local installation on **2026-10-14**, with the pet-question setting retained. This is an installation preference; each Windows account or fresh installation must enable it separately. See [VALIDATION.md](VALIDATION.md) for the checks performed.
+
 ## Source layout
 
 This folder stores the integration as a small, reproducible addition to pinned lolPing **v0.5.1**:

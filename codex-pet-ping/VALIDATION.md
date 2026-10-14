@@ -2,6 +2,16 @@
 
 Test date: **2026-10-13**. Platform: **Windows x64**. Desktop app version: **26.928.4866.0**.
 
+## Windows sign-in startup configuration — 2026-10-14
+
+- Enabled the installed app's `launchAtStartup` setting. `enabledOnStart` and `petAskEnabled` remained enabled, and all other saved settings were preserved.
+- Verified the current user's Windows Run entry named `com.lolping.app` points to the installed `lolPing.exe` with the `--hidden` argument.
+- Confirmed there was no existing Windows StartupApproved entry disabling this item.
+- Restarted lolPing and verified that the application and its input helper were running with the saved setting enabled.
+- Retained a local settings backup outside the repository. No machine-specific settings or user paths were added to this repository.
+
+The startup preference and registration were checked directly. A Windows sign-out/sign-in cycle was not performed. This configuration uses lolPing's existing startup support; no application source or binary changed.
+
 ## Current revision: green Need Vision trigger
 
 On 2026-10-13, the pet action moved from `missing` / `?` to `needvision`, matching the green icon supplied by the user. Settings labels, English and Chinese question text, documentation, and regression checks were updated.
