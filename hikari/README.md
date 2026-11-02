@@ -10,6 +10,14 @@ workflow now live in the sibling [personal_assistant/](../personal_assistant/) p
 There is one library implementation. Hikari may contribute evidence-backed handoffs;
 a meeting does not automatically connect all projects or publish its conversation.
 
+The [scientific review tool](../overleaf-related/tex-grammarly-reviewer/README.md)
+is maintained in this same repository at `overleaf-related/tex-grammarly-reviewer/`.
+Its CLI and skill remain independent of Hikari's meeting runtime. See the
+[shared toolkit guide](../docs/research-toolkit.md) for entry points and offline
+verification. A Codex skill in the repository is not automatically available to
+OpenClaw; using it there requires verified dependencies, source access and the
+user's authorization for any manuscript transmission or publication.
+
 ## Layout
 
 - `Start-Hikari.cmd`: Windows launcher entry point.

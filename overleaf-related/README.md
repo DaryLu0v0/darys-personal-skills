@@ -1,5 +1,11 @@
 # Overleaf-related skills
 
+This category is part of the same repository as the [Hikari meeting assistant](../hikari/README.md)
+and [personal assistant](../personal_assistant/README.md). See the
+[shared research-toolkit guide](../docs/research-toolkit.md) for their entry points
+and independent setup requirements. The reviewer remains in the directory below;
+there is no second copy under Hikari.
+
 ## TeX Grammarly Reviewer
 
 [`tex-grammarly-reviewer/`](tex-grammarly-reviewer/) contains:

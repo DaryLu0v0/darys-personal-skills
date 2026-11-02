@@ -9,6 +9,7 @@ public; personal records and runtime configuration belong in private local stora
 | --- | --- | --- |
 | [personal_assistant/](personal_assistant/) | Today, Life, Research and Literature dashboard; research handoffs, Obsidian notes and private attention support | [Setup and tests](personal_assistant/README.md) |
 | [hikari/](hikari/) | Zoom voice participant and reusable project meeting agent | [Setup and tests](hikari/README.md) |
+| [Scientific review tool](overleaf-related/tex-grammarly-reviewer/) | `scientific-tex-reviewer` skill and `tex-review` CLI for source-preserving manuscript review | [Setup and tests](overleaf-related/tex-grammarly-reviewer/README.md) |
 | [overleaf-related/](overleaf-related/) | Scientific LaTeX review, Grammarly-assisted analysis and supervised Overleaf review-panel workflows | [Guide](overleaf-related/README.md) |
 | [codex-pet-ping/](codex-pet-ping/) | Windows Need Vision questions answered by the desktop pet; built on [lolPing](https://github.com/darrenprx/lolPing), with inspiration from [super-ping](https://github.com/norvancc/super-ping) | [Guide](codex-pet-ping/README.md) |
 | [paper/](paper/) | Existing paper-library tooling | [Guide](paper/README.md) |
@@ -16,6 +17,18 @@ public; personal records and runtime configuration belong in private local stora
 Each component keeps its instructions, references, implementation and tests together
 so it can be audited before installation. Follow that component's prerequisites;
 cloning this repository does not install applications, skills, integrations or tasks.
+
+## Scientific review and Hikari: one repository
+
+Both tools are maintained here. The scientific reviewer already occupied
+`overleaf-related/tex-grammarly-reviewer/` before Hikari was added; that remains its
+canonical location. Hikari remains in `hikari/`. Existing import paths, CLI names
+and skill locations are preserved, with no duplicate reviewer package.
+
+The [shared research-toolkit guide](docs/research-toolkit.md) maps their entry
+points, setup, offline tests and optional handoff to the personal assistant.
+Repository consolidation does not automatically install the reviewer into Hikari's
+runtime or authorize manuscript uploads, Overleaf comments or meeting participation.
 
 ## Personal assistant quick start
 

@@ -115,3 +115,9 @@ The sibling [Hikari package](../hikari/README.md) contains the Zoom/project meet
 agent. It can contribute deliberately prepared handoffs to this library; it does
 not contain a second dashboard or automatically ingest meeting transcripts.
 See [source and migration notes](../hikari/SOURCE.md) for the additive consolidation.
+
+The same repository also contains the
+[scientific review tool](../overleaf-related/tex-grammarly-reviewer/README.md).
+Selected review findings can enter the library through an approved handoff; a
+review comment remains feedback, not a validated scientific result. The
+[shared toolkit guide](../docs/research-toolkit.md) describes all three components.

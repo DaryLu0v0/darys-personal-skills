@@ -1,5 +1,12 @@
 # TeX Grammarly Reviewer
 
+This is the canonical scientific review component of `darys-personal-skills`, at
+`overleaf-related/tex-grammarly-reviewer/`. Its `scientific-tex-reviewer` skill and
+`tex-review` CLI share this repository with [Hikari](../../hikari/README.md).
+See the [shared toolkit guide](../../docs/research-toolkit.md) for component boundaries.
+Run the commands below from this directory. No package, command or skill was renamed
+when Hikari joined the repository.
+
 A conservative, comment-first reviewer for English prose inside a single `.tex` file. It:
 
 1. extracts reviewable prose without executing LaTeX or following `\input` files;
@@ -158,6 +165,20 @@ The AI percentage remains in the audit record for context but never controls acc
 
 ## Test
 
+With Python 3.11+ and pytest already available, run from this component directory:
+
 ```powershell
-python -m pytest -q
+python -B -m pytest -q -o pythonpath=src
 ```
+
+The explicit source path ensures these tests exercise this checkout without needing
+an editable install or accidentally using another installed version. Tests use
+synthetic manuscripts and mocked services; they do not send a manuscript to
+Grammarly/OpenAI or publish to Overleaf. Normal review commands do use external
+services as described above. A meeting request alone does not authorize those
+uploads or native Overleaf publication.
+
+Review artifacts stay beside their private source manuscript. To preserve progress
+in the [research library](../../personal_assistant/docs/maintenance.md), prepare a
+concise approved handoff with source revision, review scope, findings and uncertainty.
+Do not copy confidential manuscripts or complete review logs into this public repo.
