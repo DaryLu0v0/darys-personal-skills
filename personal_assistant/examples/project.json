@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "id": "sample-research",
+  "title": "Sample research — synthetic demo",
+  "summary": "Fictional branching research example.",
+  "coverage": "Synthetic example only. No real project, paper or conversation is represented.",
+  "revision": 0,
+  "sources": [],
+  "evidence": [
+    {
+      "id": "sample-document",
+      "title": "Synthetic example evidence",
+      "kind": "document",
+      "basis": "observed_record",
+      "summary": "Fictional example for demonstrating provenance; no real result or conversation.",
+      "access": "checked",
+      "access_note": "Synthetic fixture only; nothing was fetched or executed.",
+      "checked_at": "2026-01-01T00:00:00Z",
+      "occurred_at": null,
+      "url": "https://example.test/evidence/sample-document"
+    },
+    {
+      "id": "sample-user",
+      "title": "Synthetic example evidence",
+      "kind": "conversation",
+      "basis": "user_decision",
+      "summary": "Fictional example for demonstrating provenance; no real result or conversation.",
+      "access": "checked",
+      "access_note": "Synthetic fixture only; nothing was fetched or executed.",
+      "checked_at": "2026-01-01T00:00:00Z",
+      "occurred_at": null,
+      "provider": "codex-desktop",
+      "conversation_id": "synthetic-thread",
+      "message_id": "synthetic-message",
+      "message_reference_kind": "synthetic fixture, not a real native ID",
+      "native_reference": "Synthetic native-interface example; not a real session",
+      "speaker": "user",
+      "excerpt": "Fictional user decision: compare both sample approaches.",
+      "retrieval": "Generated fixture, not a transcript."
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "foundation",
+      "title": "Example foundation",
+      "status": "completed",
+      "status_note": "Synthetic demonstration checkpoint.",
+      "goal": "Illustrate a research checkpoint with explicit evidence and next steps.",
+      "done": [
+        {
+          "text": "This fictional example demonstrates the record format; it is not a research claim.",
+          "basis": "observed_record",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "text": "Replace the example with a reviewed source-backed handoff in your local data.",
+          "basis": "proposal",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sample-document"
+      ],
+      "occurred_at": null,
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "papers": []
+    },
+    {
+      "id": "prototype",
+      "title": "Example prototype",
+      "status": "completed",
+      "status_note": "Synthetic demonstration checkpoint.",
+      "goal": "Illustrate a research checkpoint with explicit evidence and next steps.",
+      "done": [
+        {
+          "text": "This fictional example demonstrates the record format; it is not a research claim.",
+          "basis": "observed_record",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "text": "Replace the example with a reviewed source-backed handoff in your local data.",
+          "basis": "proposal",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sample-document"
+      ],
+      "occurred_at": null,
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "papers": []
+    },
+    {
+      "id": "evaluation",
+      "title": "Example evaluation",
+      "status": "active",
+      "status_note": "Synthetic demonstration checkpoint.",
+      "goal": "Illustrate a research checkpoint with explicit evidence and next steps.",
+      "done": [
+        {
+          "text": "This fictional example demonstrates the record format; it is not a research claim.",
+          "basis": "observed_record",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "text": "Replace the example with a reviewed source-backed handoff in your local data.",
+          "basis": "proposal",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sample-document"
+      ],
+      "occurred_at": null,
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "papers": []
+    },
+    {
+      "id": "synthesis",
+      "title": "Combine both branches",
+      "status": "possible",
+      "status_note": "Synthetic demonstration checkpoint.",
+      "goal": "Illustrate a research checkpoint with explicit evidence and next steps.",
+      "done": [
+        {
+          "text": "This fictional example demonstrates the record format; it is not a research claim.",
+          "basis": "observed_record",
+          "evidence_ids": [
+            "sample-document",
+            "sample-user"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "text": "Replace the example with a reviewed source-backed handoff in your local data.",
+          "basis": "proposal",
+          "evidence_ids": [
+            "sample-document",
+            "sample-user"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sample-document",
+        "sample-user"
+      ],
+      "occurred_at": null,
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "papers": [
+        {
+          "paper_id": "sample-paper-b",
+          "relevance": "Synthetic context-specific relevance, separate from the general paper summary."
+        }
+      ]
+    },
+    {
+      "id": "parked-idea",
+      "title": "Parked alternative",
+      "status": "parked",
+      "status_note": "Synthetic demonstration checkpoint.",
+      "goal": "Illustrate a research checkpoint with explicit evidence and next steps.",
+      "done": [
+        {
+          "text": "This fictional example demonstrates the record format; it is not a research claim.",
+          "basis": "observed_record",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "text": "Replace the example with a reviewed source-backed handoff in your local data.",
+          "basis": "proposal",
+          "evidence_ids": [
+            "sample-document"
+          ]
+        }
+      ],
+      "evidence_ids": [
+        "sample-document"
+      ],
+      "occurred_at": null,
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "papers": []
+    }
+  ],
+  "relationships": [
+    {
+      "from": "foundation",
+      "to": "prototype",
+      "kind": "progression",
+      "rationale": "Synthetic progression example."
+    },
+    {
+      "from": "foundation",
+      "to": "evaluation",
+      "kind": "progression",
+      "rationale": "Synthetic progression example."
+    },
+    {
+      "from": "prototype",
+      "to": "synthesis",
+      "kind": "progression",
+      "rationale": "Synthetic progression example."
+    },
+    {
+      "from": "evaluation",
+      "to": "synthesis",
+      "kind": "progression",
+      "rationale": "Synthetic progression example."
+    },
+    {
+      "from": "foundation",
+      "to": "parked-idea",
+      "kind": "progression",
+      "rationale": "Synthetic progression example."
+    }
+  ],
+  "applied_updates": []
+}

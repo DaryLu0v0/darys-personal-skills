@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-attention-snapshot",
+  "checked_at": "2026-01-01T00:00:00Z",
+  "coverage": "Synthetic example only. No mailbox is connected or inspected.",
+  "accounts": [
+    {
+      "id": "example-account",
+      "label": "Synthetic account — not connected",
+      "email": "reader@example.test"
+    }
+  ],
+  "items": [
+    {
+      "id": "example-reminder",
+      "title": "Synthetic reminder — review a sample note",
+      "section": "research",
+      "priority": "low",
+      "evidence_status": "needs_verification",
+      "summary": "Fictional demonstration; no real task is inferred.",
+      "action": "Review the sample format.",
+      "source": {
+        "account_id": "example-account",
+        "date": "2026-01-01",
+        "url": "https://mail.google.com/mail/?authuser=reader%40example.test#search/rfc822msgid%3Asynthetic%40example.test",
+        "rfc822_message_id": "<synthetic@example.test>",
+        "gmail_message_id": "1abc",
+        "gmail_thread_id": "2def",
+        "message_id_checked_at": "2026-01-01T00:00:00Z"
+      },
+      "dates": [],
+      "links": [],
+      "project_refs": [
+        "sample-research"
+      ]
+    }
+  ]
+}

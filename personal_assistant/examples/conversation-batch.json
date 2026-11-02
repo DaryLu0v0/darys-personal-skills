@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "synthetic-batch",
+  "provider": "codex-desktop",
+  "scope": "all-projects",
+  "report_date": "2026-01-01",
+  "recorded_at": "2026-01-01T00:00:00Z",
+  "coverage": {
+    "listing_complete": false,
+    "note": "Synthetic example, not a real read.",
+    "gaps": [
+      "No real sessions were inspected."
+    ]
+  },
+  "projects": [
+    {
+      "project_key": "codex-desktop:local:synthetic-project",
+      "title": "Synthetic project",
+      "host": "local",
+      "working_directory": "SYNTHETIC_WORKSPACE",
+      "identity_basis": "Synthetic fixture, not a discovered folder."
+    }
+  ],
+  "sessions": [
+    {
+      "session_id": "synthetic-thread",
+      "project_key": "codex-desktop:local:synthetic-project",
+      "title": "Synthetic conversation",
+      "source_revision": "synthetic-turn",
+      "source_updated_at": null,
+      "native_reference": "Synthetic native-interface example",
+      "read": {
+        "status": "partial",
+        "message_refs": [
+          "synthetic-message"
+        ],
+        "next_cursor": null,
+        "note": "Synthetic bounded-read shape.",
+        "gaps": [
+          "No real history was read."
+        ]
+      },
+      "events": [
+        {
+          "message_ref": "synthetic-message",
+          "speaker": "user",
+          "basis": "user_decision",
+          "occurred_at": null,
+          "summary": "Fictional user requested comparing sample approaches.",
+          "verification": "Synthetic fixture; not an actual user message.",
+          "evidence_urls": []
+        }
+      ]
+    }
+  ]
+}

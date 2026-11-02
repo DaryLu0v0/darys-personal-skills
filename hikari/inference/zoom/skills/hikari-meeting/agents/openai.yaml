@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hikari Meeting"
+  short_description: "Bring a project agent into a Zoom meeting"
+  default_prompt: "Use $hikari-meeting to connect a live Zoom assistant to this project's files, coding tools, and skills."

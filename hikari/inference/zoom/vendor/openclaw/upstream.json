@@ -1,0 +1,44 @@
+{
+  "repository": "https://github.com/openclaw/openclaw",
+  "tag": "v2026.10.9",
+  "release_commit": "8b18b5578f66eab1501cba4cef2310d88bfb9a41",
+  "reviewed_on": "2026-10-29",
+  "license": "MIT",
+  "runtime_dependency": {
+    "host": "openclaw",
+    "host_version": "2026.10.9",
+    "plugin": "@openclaw/zoom-meetings",
+    "plugin_version": "2026.10.9"
+  },
+  "reuse": "The runtime is installed separately and invoked through its CLI. Only the unmodified plugin manifest and license are copied here. The manifest supports offline validation of this starter patch; OpenClaw validates the merged installed configuration.",
+  "files": [
+    {
+      "local_file": "plugin-manifest.json",
+      "upstream_path": "extensions/zoom-meetings/openclaw.plugin.json",
+      "git_blob_sha": "29b23c91a6d91d04c7857376d914025c1b755ddd",
+      "source_url": "https://github.com/openclaw/openclaw/blob/8b18b5578f66eab1501cba4cef2310d88bfb9a41/extensions/zoom-meetings/openclaw.plugin.json"
+    },
+    {
+      "local_file": "LICENSE",
+      "upstream_path": "LICENSE",
+      "git_blob_sha": "ed064819ab537575d0cad902f7e5af4a3488b1d0",
+      "source_url": "https://github.com/openclaw/openclaw/blob/8b18b5578f66eab1501cba4cef2310d88bfb9a41/LICENSE"
+    }
+  ],
+  "contract_sources": [
+    "src/meeting-bot/plugin-cli.ts",
+    "src/meeting-bot/browser-plugin-cli.ts",
+    "src/meeting-bot/plugin-config.ts",
+    "src/meeting-bot/realtime-engine.ts",
+    "src/meeting-bot/agent-consult.ts",
+    "docs/cli/config.md",
+    "docs/cli/plugins/install.md",
+    "docs/plugins/meeting-plugins.md",
+    "docs/plugins/zoom-meetings.md",
+    "docs/plugins/google-meet/config.md",
+    "src/talk/provider-resolver.ts",
+    "src/meeting-bot/realtime-engine-support.ts",
+    "src/meeting-bot/plugin-entry.ts"
+  ],
+  "validation_scope": "Offline wrapper tests only. No OpenClaw runtime installation, model invocation, Zoom meeting, or native audio round trip was performed."
+}

@@ -1,0 +1,27 @@
+{
+  "id": "sample-paper-a",
+  "title": "Synthetic reference A — not a real paper",
+  "authors": [
+    "Example, Alex",
+    "Example, Blair",
+    "Example, Casey",
+    "Example, Devon"
+  ],
+  "year": 2026,
+  "doi": "10.0000/sample-a",
+  "type": "article",
+  "url": "https://example.test/papers/a",
+  "access": "reference_only",
+  "access_note": "Synthetic metadata. No PDF was fetched or read.",
+  "summary": "Fictional reference used to demonstrate one canonical note with several research links.",
+  "reading_status": "metadata_only",
+  "checked_at": "2026-01-01T00:00:00Z",
+  "origins": [
+    {
+      "source_id": "synthetic-bibliography",
+      "record_id": "sample-paper-a",
+      "url": "https://example.test/bibliography/a",
+      "checked_at": "2026-01-01T00:00:00Z"
+    }
+  ]
+}

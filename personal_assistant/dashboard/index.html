@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Hikari · Today</title><link rel="stylesheet" href="/style.css">
+  <script src="/attention.js" defer></script><script src="/literature.js" defer></script><script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="Hikari home"><span class="sun">✳</span> hikari<span class="brand-dot">.</span></a>
+    <p class="eyebrow">YOUR LOCAL WORKSPACE</p>
+    <nav class="view-navigation" aria-label="Workspace views"><button id="nav-today">Today</button><button id="nav-life">Life</button><button id="nav-research">Research</button><button id="nav-papers" class="subnav">Literature</button></nav>
+    <p class="eyebrow project-heading">PROJECTS</p>
+    <nav id="projects" aria-label="Projects"></nav>
+    <div class="side-note"><span class="live-dot"></span> Local workspace<br><small>Private by location.<br>Evidence stays connected.</small></div>
+    <div class="candidate"><p class="eyebrow">PENDING COVERAGE</p><strong id="candidate-title">Source review</strong><p id="candidate-note">Loading source coverage.</p></div>
+    <footer>Keep the branches.<br>Remember the reasoning.</footer>
+  </aside>
+  <main>
+    <header class="topline"><span>Library <span class="muted">/</span> <span id="breadcrumb">Today</span></span><button id="refresh" class="quiet">↻ Refresh records</button></header>
+    <div id="error" role="alert" hidden></div>
+    <section id="attention-content" aria-label="Attention workspace">
+      <section class="hero"><p class="eyebrow">A LITTLE CLARITY FOR THE DAY</p><h1 id="attention-title">今天需要关注</h1><p class="subtitle" id="attention-intro">先核实，再行动。把需要留意的事和已确认的安排放在一起。</p></section>
+      <div class="workspace-portals"><a href="#life"><span>LIFE</span><strong>把日常安排好 <span aria-hidden="true">↗</span></strong><p>学校行政、课程支持、日程与工具维护</p></a><a href="#research"><span>RESEARCH</span><strong>让研究接着向前 <span aria-hidden="true">↗</span></strong><p>研究路径、文献笔记与每日会话进展</p></a></div>
+      <div class="attention-snapshot"><strong>邮件线索快照 · 非实时监控</strong><p id="attention-checked">正在读取本地快照…</p><details><summary>来源与覆盖范围</summary><p id="attention-coverage"></p><div id="attention-accounts"></div><p>邮件描述不等于当前门户状态。标记只保存到本地，不修改邮件、日历或账户。稍后提醒会在指定时间后重新显示，不发送系统通知。</p></details></div>
+      <div class="attention-toolbar"><h2 id="attention-count">需要关注</h2><label><input id="attention-handled" type="checkbox"> 显示已处理 / 稍后 / 不相关</label></div>
+      <p id="attention-feedback" role="status" aria-live="polite"></p><div id="attention-error" role="alert" hidden></div>
+      <div id="attention-list" class="attention-list"></div>
+      <h2 id="attention-fyi-title" class="attention-section-title">已确认与知悉事项</h2><div id="attention-fyi" class="attention-list compact"></div>
+    </section>
+    <details class="literature-coverage" id="maintenance-panel" hidden><summary id="maintenance-heading">Conversation intake</summary><p id="maintenance-note"></p><div id="maintenance-projects"></div><div id="maintenance-pending"></div></details>
+    <div id="research-content" hidden>
+    <section class="hero"><p class="eyebrow">A LIVING RECORD OF THE WORK</p><h1 id="title">Loading research paths…</h1><p id="summary" class="subtitle"></p><div id="sources" class="sources"></div></section>
+    <section class="overview" aria-label="Project overview"><div><span id="total" class="count">—</span><span>Checkpoints</span></div><div><span id="completed" class="count green">—</span><span>Completed</span></div><div><span id="active" class="count amber">—</span><span>Open follow-up</span></div><div><span id="possible" class="count purple">—</span><span>Possible</span></div><p id="revision"></p></section>
+    <section class="workspace">
+      <div class="map-panel">
+        <div class="panel-heading"><div><h2>Research path</h2><p>Follow a branch. Open a checkpoint.</p></div><button id="expand" class="quiet">Expand all</button></div>
+        <div class="toolbar"><label class="search"><span>⌕</span><input id="search" type="search" placeholder="Find a checkpoint…" aria-label="Find a checkpoint"></label><select id="status" aria-label="Filter by status"><option value="all">All stages</option><option value="completed">Completed</option><option value="active">Active</option><option value="possible">Possible</option><option value="parked">Parked</option><option value="closed">Closed</option><option value="superseded">Superseded</option></select></div>
+        <div class="map-scroll"><div id="graph" class="graph"><svg id="edges" aria-hidden="true"></svg><div id="nodes"></div></div></div>
+        <p id="map-message" class="map-message" role="status"></p>
+        <div class="legend"><span><i class="legend-dot green-bg"></i>Completed</span><span><i class="legend-dot amber-bg"></i>Open</span><span><i class="legend-dot purple-bg"></i>Possible</span><span>↳ Progression / combination</span></div>
+        <details class="coverage"><summary>Coverage & provenance</summary><p id="coverage"></p><p>Collapse and filters affect this browser only. They never remove stored history. Dates describe source work when known; evidence-check dates are separate.</p><p>Conversation evidence contains selected message citations, not a complete chat archive. Assistant proposals are never promoted to user decisions or experimental proof.</p><div id="workflow-evidence"></div></details>
+      </div>
+      <article id="detail" class="detail" aria-label="Checkpoint details" aria-live="polite"><p>Select a checkpoint to read its goal, findings and next actions.</p></article>
+    </section>
+    <section class="workflow-note"><span>↗</span><div><strong>A path, not just a progress bar.</strong><p>Completed work stays visible. Open questions and possible branches keep their evidence and the decisions that led here.</p></div></section>
+    </div>
+    <div id="papers-content" hidden>
+      <aside id="vault-note" class="vault-note" aria-label="Obsidian vault"></aside>
+      <section class="hero"><p class="eyebrow">SOURCES THAT CONNECT THE WORK</p><h1>Literature</h1><p class="subtitle">One reference. Every research connection. Browse the papers, books and sources indexed so far.</p></section>
+      <section class="overview" aria-label="Literature overview"><div><span id="paper-total" class="count">0</span><span>Indexed references</span></div><div><span id="paper-reviewed" class="count green">0</span><span>Reviewed in Hikari</span></div><div><span id="paper-projects" class="count purple">0</span><span>Related projects</span></div><div><span id="paper-gaps" class="count amber">0</span><span>Source gaps</span></div></section>
+      <details class="literature-coverage"><summary id="paper-coverage-heading">Indexed coverage</summary><p>This index is not an exhaustive inventory. Existing bibliography or vault records retain their origin identities; Hikari stores metadata and research links, not replacement PDF archives.</p><div id="paper-source-list"></div></details>
+      <section class="literature-workspace">
+        <div class="paper-list-panel"><div class="panel-heading"><div><h2>All indexed references</h2><p>Search titles, authors, DOI or citation keys.</p></div><button id="paper-reset" class="quiet">Clear filters</button></div>
+          <div class="paper-toolbar"><label class="search"><span>⌕</span><input id="paper-search" type="search" placeholder="Find a paper…" aria-label="Search literature"></label><div class="paper-filters"><select id="paper-status" aria-label="Filter literature by reading status"><option value="all">All reading states</option><option value="metadata_only">Metadata only</option><option value="queued">To read</option><option value="reading">Reading</option><option value="reviewed">Reviewed</option></select><select id="paper-project" aria-label="Filter literature by project"><option value="all">All projects</option></select><select id="paper-type" aria-label="Filter literature by type"><option value="all">All source types</option></select></div></div>
+          <p id="paper-count" role="status" class="map-message"></p><div id="paper-list" class="paper-list" aria-label="Indexed literature"></div>
+        </div>
+        <article id="paper-detail" class="detail paper-detail" aria-label="Literature detail" aria-live="polite"></article>
+      </section>
+      <section class="workflow-note"><span>▤</span><div><strong>A citation is the beginning of a reading record.</strong><p>Metadata-only entries do not imply the paper has been read. General summaries stay separate from each project's reason for citing them.</p></div></section>
+    </div>
+  </main>
+</body>
+</html>
